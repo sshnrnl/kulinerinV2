@@ -1,0 +1,149 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #DECEB0ff;
+    /* background-blend-mode: #DECEB0ff; */
+}
+
+/* Container for centering content */
+.container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
+    height: 100%;             /* Full height */
+    flex-direction: column;  /* Stack content vertically */
+    text-align: center;      /* Center text */
+}
+
+/* Styling for the logo container */
+.logo-container {
+    margin-bottom: 0px; /* Reduced space between logo and login form */
+    margin-top:-50px;
+}
+
+.logo-container img {
+    max-width: 120px; /* Limit logo size */
+    height: auto;     /* Maintain aspect ratio */
+}
+
+/* Login form styling */
+.login-container {
+    background-color: wheat;
+    /* background: linear-gradient(to left, #DECEB0, #B5A26B); */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Input fields styling */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.input-group input:focus {
+    border-color: #D67B47ff;
+    outline: none;
+}
+
+/* Button styling */
+.login-button {
+    background-color: #D67B47ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #B76C3D;
+}
+
+/* Google Sign Up button styling */
+.google-button {
+    background-color: #D67B47ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.google-button:hover {
+    background-color: #B76C3D;
+}
+
+.google-button img {
+    width: 20px;
+    height: 20px;
+}
+
+.backbutton {
+    background-color: rgb(215, 176, 105);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.backbutton:hover {
+    background-color: #B76C3D;
+}
+/* Link to sign up */
+.signup-link {
+    margin-top: 20px;
+}
+
+.signup-link a {
+    color: #D67B47;
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    margin-bottom: 20px;
+}
+
+.error-message p {
+    margin: 0;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.scrol{
+    margin-top: 120px;
+}

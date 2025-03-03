@@ -1,0 +1,51 @@
+.section_coctail{
+margin-right: 30px;
+}
+
+.img_coctail{
+  max-width: 400px;
+    height: 300px;
+    object-fit: cover;
+
+}
+
+
+.titleCard{
+    color: #111F29ff;
+    margin-bottom: 20px;
+
+    
+}
+
+.box_coctail{
+    display: flex;
+ background-color: green;
+    gap: 2rem;
+    
+    
+}
+
+
+
+
+
+
+
+
+.card_coctail_container{
+    background-color: #fff;
+    flex-flow: column wrap;
+   
+}
+.restaurantName{
+    margin: 30px 20px 10px 20px;
+
+  
+}
+
+
+.restaurantCity{
+   
+    margin: 0px 20px 10px 20px;
+
+}

@@ -1,0 +1,151 @@
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* background-color: #DECEB0ff; */
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .body{
+            background-color: #DECEB0ff;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: #DECEB0ff;
+        }
+
+        .greeting {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* iklan start disini */
+        .ad-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .ad-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: none;
+        }
+
+        .ad-slide.active {
+            opacity: 1;
+            display: block;
+        }
+
+        .ad-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Slideshow Controls */
+        .slide-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .slide-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slide-dot.active {
+            background-color: white;
+        }
+
+        /* Navigation arrows */
+        .slide-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .slide-nav:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .prev-slide {
+            left: 10px;
+        }
+
+        .next-slide {
+            right: 10px;
+        }
+        /* iklan smpe sini */
+
+
+
+        .section-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .restaurant-card {
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .restaurant-image {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            background-color: #ddd;
+            background-repeat: no-repeat;
+        }
+
+        .restaurant-info {
+            background-color: white;
+            padding: 1rem;
+        }
+
+        .restaurant-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .restaurant-location {
+            color: #666;
+        }

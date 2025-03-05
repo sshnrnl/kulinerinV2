@@ -68,6 +68,7 @@ Route::middleware(['customer'])->group(function () {
     Route::post('/checkStatus', [MidtransController::class, 'checkStatus'])->name('checkStatus');
 
     Route::get('/history', [ReservationController::class, 'history'])->name('history');
+    Route::post('/history', [ReservationController::class, 'filterDate'])->name('filter');
     Route::post('/reservation/{id}/cancel', [ReservationController::class, 'cancelOrder'])->name('reservation.cancelOrder');
     Route::post('/reservation/{id}/finish', [ReservationController::class, 'finishOrder'])->name('reservation.finishOrder');
     Route::post('/rating/store', [RatingRestaurantController::class, 'store'])->name('rating.store');

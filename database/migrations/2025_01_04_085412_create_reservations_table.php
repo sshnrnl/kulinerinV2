@@ -19,8 +19,10 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');
+            $table->unsignedBigInteger('table_restaurant_id');
+            $table->foreign('table_restaurant_id')->references('id')->on('table_restaurants');
             $table->integer("guest");
-            $table->string("tableType");
+            // $table->string("tableType");
             $table->string("restaurantName")->nullable();
             $table->date("reservationDate");
             $table->time("reservationTime");

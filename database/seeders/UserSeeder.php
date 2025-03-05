@@ -18,25 +18,11 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
-
-        for ($i = 0; $i < 50; $i++) {
-            DB::table('users')->insert([
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
-                'role' => '1',
-                'email_verified_at' => now(),
-                'password' => Hash::make('password123'),
-                'remember_token' => Str::random(10),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
         DB::table('users')->insert([
             [
-                'id' => 51,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 1,
+                'email' => 'lawry@gmail.com',
+                'username' => 'Lawry',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -45,9 +31,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 52,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 2,
+                'email' => 'anigre@gmail.com',
+                'username' => 'Anigre',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -56,9 +42,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 53,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 3,
+                'email' => 'nusaindonesia@gmail.com',
+                'username' => 'Nusa Indonesia',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -67,9 +53,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 54,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 5,
+                'email' => 'blanco@gmail.com',
+                'username' => 'Blanco',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -78,9 +64,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 55,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 6,
+                'email' => 'the1945restaurant@gmail.com',
+                'username' => NULL,
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -89,9 +75,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 56,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 7,
+                'email' => 'grandhyat@gmail.com',
+                'username' => 'Grand Hyat',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -100,9 +86,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 57,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 8,
+                'email' => 'viewrestaurant@gmail.com',
+                'username' => NULL,
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -111,9 +97,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 58,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 9,
+                'email' => 'justus@gmail.com',
+                'username' => 'Justus',
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),
@@ -122,9 +108,9 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'id' => 59,
-                'email' => $faker->unique()->safeEmail,
-                'username' => $faker->unique()->userName,
+                'id' => 10,
+                'email' => 'merahputih@gmail.com',
+                'username' => NULl,
                 'role' => '2',
                 'email_verified_at' => now(),
                 'password' => bcrypt('qwerty123'),

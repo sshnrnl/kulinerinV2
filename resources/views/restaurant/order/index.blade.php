@@ -30,7 +30,7 @@
                                         <th>Status</th>
                                         <th>Booking Code</th>
                                         <th>Menu</th>
-                                        <th>Price</th>
+                                        <th>Payment</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

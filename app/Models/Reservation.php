@@ -29,4 +29,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(RatingRestaurant::class, 'rating_id');
     }
+
+    public function tableRestaurant()
+    {
+        return $this->belongsTo(TableRestaurant::class, 'table_restaurant_id');
+    }
 }

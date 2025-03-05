@@ -244,24 +244,6 @@
                             <p><strong>Contact:</strong> {{ $restaurants->restaurantPhoneNumber }} |
                                 {{ $restaurants->restaurantEmail }}</p>
                         </div>
-                        <div class="col-md-6">
-                            <h5>Book Table</h5>
-                            {{--
-                        <form>
-                            --}}
-                            <div class="mb-3">
-                                <label for="people" class="form-label">People</label>
-                                <input type="number" class="form-control" id="people">
-                            </div>
-                            <div class="mb-3">
-                                <label for="date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="date">
-                            </div>
-                            <button id="myBtn" onclick="myBtnClick()" class="btn btn-primary">Book Now</button>
-                            {{--
-                        </form>
-                        --}}
-                        </div>
                     </div>
                 </div>
             </section>
@@ -320,49 +302,51 @@
                         <h5 style="padding-top:1rem">Reserve a Table</h5>
                         <div class="mb-3">
                             <label for="inputGuest" class="form-label">Number of People</label>
-                            <input type="number" id="inputGuest" name="guest" class="form-control" required>
+                            <select id="inputGuest" name="guest" class="form-control" required>
+                                @foreach ($capacities as $capacity)
+                                    <option value="{{ $capacity }}">{{ $capacity }} People</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="inputArea" class="form-label">Choose Area</label>
-                            <input type="text" id="inputArea" name="tableType" class="form-control" required>
-                        </div>
+                        <p>*Available Tables: <span id="availableTables">{{ $totalAvailableTables }}</span></p>
+
                         <div class="mb-3">
                             <label for="inputDate" class="form-label">Reservation Date</label>
-                            <input type="date" id="inputDate" name="reservationDate" class="form-control" required>
+                            <input type="date" id="inputDate" name="reservationDate" class="form-control" required
+                                min="{{ date('Y-m-d') }}">
                         </div>
+
+                        @php
+                            use Carbon\Carbon;
+                            $currentTime = Carbon::now()->format('H:i');
+                            $currentHour = Carbon::now()->hour;
+                            $currentMinute = Carbon::now()->minute;
+                        @endphp
+
                         <div class="mb-3">
                             <label for="inputTime" class="form-label">Reservation Time</label>
-                            <input type="time" id="inputTime" name="reservationTime" class="form-control" required>
+                            <select id="inputTime" name="reservationTime" class="form-control" required>
+                                {{-- <option value="">Select Time</option> --}}
+                                @foreach (range(0, 23) as $hour)
+                                    @foreach (['00', '15', '30', '45'] as $minute)
+                                        @php
+                                            $time = sprintf('%02d:%s', $hour, $minute);
+                                        @endphp
+                                        @if ($hour > $currentHour || ($hour == $currentHour && (int) $minute > $currentMinute))
+                                            <option value="{{ $time }}">{{ $time }} WIB</option>
+                                        @endif
+                                    @endforeach
+                                @endforeach
+                            </select>
                         </div>
+
+
                         <div>
                             <input type="hidden" id="inputRestaurantName" name="restaurantName"
                                 value={{ $restaurants->restaurantName }}>
                         </div>
                         <button id="myBtn" onclick="myBtnClick()" class="btn btn-primary">Reserve Now</button>
                     </div>
-
-                    {{-- <form action="{{ route('booking') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="inputGuest" class="form-label">Number of People</label>
-                            <input type="number" id="inputGuest" name="guest" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="inputArea" class="form-label">Choose Area</label>
-                            <input type="text" id="inputArea" name="tableType" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="inputDate" class="form-label">Reservation Date</label>
-                            <input type="date" id="inputDate" name="reservationDate" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="inputTime" class="form-label">Reservation Time</label>
-                            <input type="time" id="inputTime" name="reservationTime" class="form-control" required>
-                        </div>
-                        <input type="hidden" id="inputRestaurantName" name="restaurantName"
-                            value="{{ $restaurants->restaurantName }}">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form> --}}
 
                     <div class="col">
                         <h5 style="padding-top:2rem">Table Reservation Terms and Conditions</h5>
@@ -458,6 +442,7 @@
                         <input type="hidden" name="reservationTime" id="time_hidden">
                         <input type="hidden" name="priceTotal" id="price_hidden">
                         <input type="hidden" name="menuData" id="menu_hidden">
+                        <input type="hidden" name="tableRestaurantId" value="">
                         <input type="hidden" name="restaurantId" value="{{ $restaurants->id }}">
                         <button type="submit" class="button book-button">Book Table</button>
                     </form>
@@ -584,7 +569,7 @@
             var modal = document.getElementById("myModal");
             var span = document.getElementsByClassName("close")[0];
             const inputGuest = document.getElementById("inputGuest");
-            const inputArea = document.getElementById("inputArea");
+            // const inputArea = document.getElementById("inputArea");
             // document.getElementById('inputRestaurantName').value = "{{ $restaurants->restaurantName }}";
 
             const inputRestaurantName = document.getElementById("restaurantInfo");
@@ -600,7 +585,7 @@
                 //event.preventDefault(); // Prevent form submission
                 // console.log("test")
                 const guestValue = inputGuest.value;
-                const areaValue = inputArea.value;
+                // const areaValue = inputArea.value;
                 const restaurantNameValue = inputRestaurantName.value;
                 const dateValue = inputDate.value;
                 const timeValue = inputTime.value;
@@ -615,14 +600,14 @@
                 });
 
                 // guestInfo.textContent = `${guestValue} guests at `;
-                guestInfo.textContent = `${guestValue} guests in ${areaValue}`;
+                guestInfo.textContent = `${guestValue} Peoples at`;
                 reservationInfo.innerHTML = `${formattedDate}, ${timeValue}WIB`;
 
                 const guest_hidden = document.getElementById("guest_hidden");
                 guest_hidden.value = inputGuest.value;
 
-                const area_hidden = document.getElementById("area_hidden");
-                area_hidden.value = inputArea.value;
+                // const area_hidden = document.getElementById("area_hidden");
+                // area_hidden.value = inputArea.value;
 
                 const restaurantName_hidden = document.getElementById("inputRestaurantName");
                 restaurantName_hidden.value = inputRestaurantName.value;
@@ -657,7 +642,7 @@
 
             function redirectToMenu() {
                 const guestInfo = inputGuest.value;
-                const areaInfo = inputArea.value;
+                // const areaInfo = inputArea.value;
                 // const reservationInfo = document.getElementById('reservation-info').textContent;
                 const reservationDate = inputDate.value;
                 const reservationTime = inputTime.value;

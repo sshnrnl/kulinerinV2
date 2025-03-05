@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\MenuRestaurant;
 use App\Models\RatingRestaurant;
+use App\Models\TableRestaurant;
 use App\Models\User;
 
 class RestaurantController extends Controller
@@ -77,35 +78,24 @@ class RestaurantController extends Controller
         ->orderBy('category')
         ->get()
         ->groupBy('category');
-        // $firstImage = $restaurants->restaurantImage->first();
-        // die($firstImage);
         $images = explode(', ', $restaurants->restaurantImage);
-        // $firstImage = $images[0] ?? null;
-        // dd($firstImage);
-
-        // $ratings = Restaurant::with('ratingRestaurants')->findOrFail($id);
-
-        // $averageScore = $ratings->ratingRestaurants->avg('score') ?? 0;
-
-        // $totalReviewers = $ratings->ratingRestaurants->count();
 
         $ratingData = $this->getRating($id);
 
-        // dd($ratingData);
+        // Ambil kapasitas tertinggi dari meja yang tersedia
+        $maxCapacity = TableRestaurant::where('restaurant_id', $id)
+            ->max('tableCapacity');
+        // dd($maxCapacity);
+        // Pastikan $maxCapacity adalah integer, jika null set default ke 1
+        $maxCapacity = $maxCapacity ? (int) $maxCapacity : 1;
 
-        // $appetizer = MenuRestaurant::where('category', 'Appetizer')
-        //     ->where('restaurant_id', $id)
-        //     ->get();
-        // $mainCourses = MenuRestaurant::where('category', 'Main Course')
-        //     ->where('restaurant_id', $id)
-        //     ->get();
-        // $dessert = MenuRestaurant::where('category', 'Dessert')
-        //     ->where('restaurant_id', $id)
-        //     ->get();
-        // $beverages = MenuRestaurant::where('category', 'Beverages')
-        //     ->where('restaurant_id', $id)
-        //     ->get();
-        return view('index.restaurantIndex', compact('restaurants', 'ratingData', 'images', 'menuItems'));
+        // Buat array dari 1 sampai kapasitas tertinggi
+        $capacities = range(1, $maxCapacity);
+
+        $totalAvailableTables = TableRestaurant::where('restaurant_id', $id)
+            ->sum('availableTables');
+
+        return view('index.restaurantIndex', compact('restaurants', 'ratingData', 'images', 'menuItems', 'capacities', 'totalAvailableTables'));
     }
     public function getRating($id)
     {

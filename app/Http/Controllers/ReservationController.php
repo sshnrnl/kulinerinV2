@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Models\Receipt;
 use App\Models\Reservation;
 use App\Models\Restaurant;
+use App\Models\TableRestaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,17 +18,23 @@ class ReservationController extends Controller
 {
     public function booking(Request $request)
     {
+        $table = TableRestaurant::where('restaurant_id', $request->restaurantId)
+            ->where('tableCapacity', '>=', $request->guest)
+            ->where('availableTables', '>', 0)
+            ->orderBy('tableCapacity', 'asc')
+            ->first();
         $booking = new Reservation();
         $booking->user_id = auth()->id();
         $booking->guest = $request->guest;
-        $booking->tableType = $request->tableType;
+        // $booking->tableType = $request->tableType;
         $booking->reservationDate = $request->reservationDate;
         $booking->reservationTime = $request->reservationTime;
         $booking->restaurantName = $request->restaurantName;
         $booking->reservationStatus = 'On Going';
-        $booking->bookingCode = 'NER' . strtoupper(bin2hex(random_bytes(4))) . '-' . 'IN' . time();
+        $booking->bookingCode = 'NER' . strtoupper(bin2hex(random_bytes(4))) . 'IN' . time();
         $booking->priceTotal = $request->priceTotal;
         $booking->restaurant_id = $request->restaurantId;
+        $booking->table_restaurant_id = $table->id;
 
         // Cek apakah menuData dikirimkan
         if (!empty($request->menuData)) {
@@ -59,11 +66,12 @@ class ReservationController extends Controller
         }
 
         $booking->save();
+        $table->decrement('availableTables');
 
         // Data untuk email notifikasi
         $reservationData = [
             'id' => $booking->id,
-            'tableType' => $booking->tableType,
+            // 'tableType' => $booking->tableType,
             'bookingCode' => $booking->bookingCode,
             'reservationDate' => $booking->reservationDate,
             'reservationTime' => $booking->reservationTime,

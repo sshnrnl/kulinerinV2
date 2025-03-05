@@ -211,7 +211,7 @@
 
                     <hr>
                     @if ($reservations->isEmpty())
-                        <p>No reservations found.</p>
+                        <p class="text-muted" style="text-align: center">No reservations found.</p>
                     @else
                         @foreach ($reservations as $reservation)
                             <div class="transaction-card bg-white d-flex mb-3">
@@ -249,7 +249,7 @@
                                         </span>
                                     </p>
                                     <p class="card-text mb-3 fst-italic">
-                                        Date: {{ \Carbon\Carbon::parse($reservation->reservationDate)->format('d/m/y') }} |
+                                        Date: {{ \Carbon\Carbon::parse($reservation->reservationDate)->format('d-m-y') }} |
                                         Time: {{ \Carbon\Carbon::parse($reservation->reservationTime)->format('H:i') }}
                                     </p>
                                     {{-- <p class="card-text mb-1">
@@ -308,14 +308,20 @@
                                                 @php
                                                     $userRating = $reservation->restaurant->ratingRestaurants
                                                         ->where('user_id', auth()->id())
+                                                        ->where('reservation_id', $reservation->id)
                                                         ->first();
                                                 @endphp
                                                 @if ($userRating)
-                                                    <p class="stars mb-1" style="margin-top: 1rem" disabled>
-                                                        @for ($i = 0; $i < $userRating->score; $i++)
-                                                            ★
+                                                    <p class="stars mb-1" style="margin-top: 1rem; font-size: 24px;">
+                                                        @for ($i = 0; $i < 5; $i++)
+                                                            @if ($i < $userRating->score)
+                                                                <span style="color: #f97e0a;">&#9733;</span>
+                                                                <!-- Bintang terisi -->
+                                                            @else
+                                                                <span style="color: gray;">&#9733;</span>
+                                                                <!-- Bintang kosong -->
+                                                            @endif
                                                         @endfor
-                                                        {{-- ({{ $userRating->score }}) --}}
                                                     </p>
                                                 @else
                                                     <button class="btn btn-sm border-dark give-rating-btn"
@@ -336,6 +342,8 @@
                                 </div>
                             </div>
                         @endforeach
+                        <!-- See More Link -->
+                        <p class="text-center mt-4 text-muted">Display all transaction records...</p>
                     @endif
 
                     <!-- Transaction Card 1 -->
@@ -392,8 +400,8 @@
                     </div>
                 </div> --}}
 
-                    <!-- See More Link -->
-                    <p class="text-center mt-4 text-muted">Display all transaction records...</p>
+                    {{-- <!-- See More Link -->
+                    <p class="text-center mt-4 text-muted">Display all transaction records...</p> --}}
                 </div>
             </div>
         </div>
@@ -437,14 +445,17 @@
                             <input type="hidden" id="reservation_id" name="reservation_id">
 
                             <div class="mb-3">
-                                <label for="score" class="form-label">Rating (1-5)</label>
-                                <select class="form-select" id="score" name="score" required>
-                                    <option value="1">★ - 1</option>
-                                    <option value="2">⭐⭐ - 2</option>
-                                    <option value="3">⭐⭐⭐ - 3</option>
-                                    <option value="4">⭐⭐⭐⭐ - 4</option>
-                                    <option value="5">⭐⭐⭐⭐⭐ - 5</option>
-                                </select>
+                                <label for="score" class="form-label">Rating</label>
+                                <div id="starRating" class="star-rating d-flex align-items-center mb-2">
+                                    <!-- Stars -->
+                                    <span class="stars" data-value="1">&#9734;</span>
+                                    <span class="stars" data-value="2">&#9734;</span>
+                                    <span class="stars" data-value="3">&#9734;</span>
+                                    <span class="stars" data-value="4">&#9734;</span>
+                                    <span class="stars" data-value="5">&#9734;</span>
+                                </div>
+                                <input type="hidden" id="score" name="score" value="">
+                                <span id="ratingDescription" class=""></span>
                             </div>
 
                             <div class="mb-3">
@@ -580,6 +591,41 @@
                 });
             });
 
+            document.addEventListener("DOMContentLoaded", function() {
+                const stars = document.querySelectorAll("#starRating .stars");
+                const ratingDescription = document.getElementById("ratingDescription");
+
+                // Define rating descriptions
+                const descriptions = {
+                    1: "Very Bad",
+                    2: "Bad",
+                    3: "Average",
+                    4: "Good",
+                    5: "Very Good"
+                };
+
+                stars.forEach((stars, index) => {
+                    stars.addEventListener("click", () => {
+                        const rating = index + 1;
+                        updateStars(rating);
+                        ratingDescription.textContent = descriptions[rating]; // Update description
+                        score.value = rating;
+                    });
+                });
+
+                function updateStars(rating) {
+                    stars.forEach((stars, idx) => {
+                        if (idx < rating) {
+                            stars.classList.add("filled-star");
+                            stars.innerHTML = "&#9733;";
+                        } else {
+                            stars.classList.remove("filled-star");
+                            stars.innerHTML = "&#9734;";
+                        }
+                    });
+                }
+            });
+
             $(document).ready(function() {
                 $(".give-rating-btn").click(function() {
                     let restaurantId = $(this).data("restaurant-id");
@@ -615,12 +661,7 @@
                                 confirmButtonText: "OK"
                             }).then(() => {
                                 $("#ratingModal").modal("hide");
-
-                                $("button[data-reservation-id='" + formData.reservation_id +
-                                        "']")
-                                    .replaceWith(
-                                        `<button class="btn btn-sm border-dark" disabled>${'★'.repeat(formData.score)} (${formData.score})</button>`
-                                        );
+                                location.reload();
 
                             });
                         },

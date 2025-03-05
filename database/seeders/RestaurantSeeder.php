@@ -16,19 +16,10 @@ class RestaurantSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
-
-        $userIds = DB::table('users')->where('role', 2)->pluck('id')->toArray();
-
-        if (empty($userIds)) {
-            $this->command->warn("No users with role 2 found. Skipping restaurant seeding.");
-            return;
-        }
-
         DB::table('restaurants')->insert([
             [
                 'id' => 1,
-                'user_id' => 51,
+                'user_id' => 1,
                 'restaurantName' => "Lawry's The Prime Rib Jakarta",
                 'restaurantPhoneNumber' => "0812666666001",
                 'restaurantCity' => "South Jakarta",
@@ -39,7 +30,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 2,
-                'user_id' => 52,
+                'user_id' => 2,
                 'restaurantName' => "Anigre - Sheraton Grand Jakarta Gandaria City Hotel",
                 'restaurantPhoneNumber' => "081234567890",
                 'restaurantCity' => "South Jakarta",
@@ -50,7 +41,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 9,
-                'user_id' => 53,
+                'user_id' => 9,
                 'restaurantName' => "Justus Steakhouse Alam Sutera",
                 'restaurantPhoneNumber' => "0812666666002",
                 'restaurantCity' => "South Tangerang",
@@ -71,7 +62,7 @@ class RestaurantSeeder extends Seeder
             // ],
             [
                 'id' => 5,
-                'user_id' => 54,
+                'user_id' => 5,
                 'restaurantName' => "BLANCO Par Mandif",
                 'restaurantPhoneNumber' => "0812666666004",
                 'restaurantCity' => "Kabupaten Gianyar",
@@ -82,7 +73,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 6,
-                'user_id' => 55,
+                'user_id' => 6,
                 'restaurantName' => "The 1945 Restaurant",
                 'restaurantPhoneNumber' => "0812666666005",
                 'restaurantCity' => "Central Jakarta",
@@ -93,7 +84,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 7,
-                'user_id' => 56,
+                'user_id' => 7,
                 'restaurantName' => "The Grand Hyatt Jakarta",
                 'restaurantPhoneNumber' => "0812666666006",
                 'restaurantCity' => "Central Jakarta",
@@ -104,7 +95,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 8,
-                'user_id' => 57,
+                'user_id' => 8,
                 'restaurantName' => "View Restaurant & Bar",
                 'restaurantPhoneNumber' => "0812666666007",
                 'restaurantCity' => "Yogyakarta",
@@ -115,7 +106,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 3,
-                'user_id' => 58,
+                'user_id' => 3,
                 'restaurantName' => "Nusa Indonesian Gastronomy",
                 'restaurantPhoneNumber' => "0812666666008",
                 'restaurantCity' => "South Jakarta",
@@ -126,7 +117,7 @@ class RestaurantSeeder extends Seeder
             ],
             [
                 'id' => 10,
-                'user_id' => 59,
+                'user_id' => 10,
                 'restaurantName' => "Merah Putih Restaurant",
                 'restaurantPhoneNumber' => "0812666666009",
                 'restaurantCity' => "West Jakarta",

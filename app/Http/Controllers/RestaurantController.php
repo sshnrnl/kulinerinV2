@@ -6,8 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\MenuRestaurant;
 use App\Models\RatingRestaurant;
+use App\Models\Reservation;
 use App\Models\TableRestaurant;
 use App\Models\User;
+use Carbon\Carbon;
+
 
 class RestaurantController extends Controller
 {
@@ -51,12 +54,6 @@ class RestaurantController extends Controller
 
             return $restaurant;
         });
-        // if ($minRating) {
-        //     $restaurants->setCollection($restaurants->getCollection()->filter(function ($restaurant) use ($minRating) {
-        //         return $restaurant->averageScore >= $minRating;
-        //         return round($restaurant->averageScore) == $minRating;
-        //     }));
-        // }
 
         if ($minRating) {
             $restaurants->setCollection($restaurants->getCollection()->filter(function ($restaurant) use ($minRating) {
@@ -71,6 +68,7 @@ class RestaurantController extends Controller
 
         return view('index.restaurantSearchIndex', compact('restaurants'));
     }
+
     public function indexRestaurants($id)
     {
         $restaurants = Restaurant::findOrFail($id);
@@ -97,6 +95,90 @@ class RestaurantController extends Controller
 
         return view('index.restaurantIndex', compact('restaurants', 'ratingData', 'images', 'menuItems', 'capacities', 'totalAvailableTables'));
     }
+
+    public function checkAvailableTables(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'guest' => 'required|integer',
+            'reservationDate' => 'required|date',
+            'reservationTime' => 'required',
+            'restaurant_id' => 'required|integer'
+        ]);
+
+        $guest = $request->guest;
+        $date = $request->reservationDate;
+        $time = $request->reservationTime;
+        $restaurantId = $request->restaurant_id;
+
+        // Cari meja yang sesuai dengan kapasitas dan restaurant_id
+        $tables = TableRestaurant::where('restaurant_id', $restaurantId)
+            ->where('tableCapacity', '>=', $guest)
+            ->orderBy('tableCapacity', 'asc')
+            ->get();
+
+        if ($tables->isEmpty()) {
+            return response()->json(['availableTables' => 0]);
+        }
+
+        // Ubah format waktu untuk pencarian
+        $reservationDateTime = Carbon::parse($date . ' ' . $time);
+        $availableTables = 0;
+
+        foreach ($tables as $table) {
+            // Tentukan durasi reservasi (2 jam)
+            $reservationStart = $reservationDateTime->copy();
+            $reservationEnd = $reservationDateTime->copy()->addHours(2);
+
+            // Cek reservasi yang tumpang tindih
+            $existingReservations = Reservation::where('table_restaurant_id', $table->id)
+                ->where(function ($query) use ($reservationStart, $reservationEnd) {
+                    $query->whereRaw("CONCAT(reservationDate, ' ', reservationTime) <= ?", [$reservationEnd->format('Y-m-d H:i')])
+                        ->whereRaw("DATE_ADD(CONCAT(reservationDate, ' ', reservationTime), INTERVAL 2 HOUR) >= ?", [$reservationStart->format('Y-m-d H:i')]);
+                })
+                ->count();
+
+            // Hitung jumlah meja yang tersedia
+            $availableTables += max(0, $table->availableTables - $existingReservations);
+        }
+
+        return response()->json(['availableTables' => $availableTables]);
+    }
+
+
+    // public function getAvailableTables(Request $request)
+    // {
+    //     $restaurantId = $request->input('restaurant_id'); // Ambil restaurant_id dari request
+    //     $reservationDate = $request->input('date'); // Ambil tanggal dari request
+
+    //     // Validasi input (optional)
+    //     if (!$restaurantId || !$reservationDate) {
+    //         return response()->json(['error' => 'Missing restaurant_id or date'], 400);
+    //     }
+
+    //     // Ambil hanya meja yang sesuai dengan restaurant_id
+    //     $tables = TableRestaurant::where('restaurant_id', $restaurantId)->get()->map(function ($table) use ($reservationDate) {
+    //         // Hitung jumlah reservasi untuk meja ini pada tanggal tertentu
+    //         $reservedCount = Reservation::where('table_restaurant_id', $table->id)
+    //             ->where('reservationDate', $reservationDate)
+    //             ->count();
+
+    //         // Hitung sisa meja yang tersedia
+    //         $availableTables = max(0, $table->availableTables - $reservedCount);
+
+    //         return [
+    //             'id' => $table->id,
+    //             'capacity' => $table->tableCapacity,
+    //             'available' => $availableTables,
+    //         ];
+    //     });
+
+    //     return response()->json($tables);
+    // }
+
+
+
+
     public function getRating($id)
     {
         $restaurant = Restaurant::with('ratingRestaurants.user')->findOrFail($id);

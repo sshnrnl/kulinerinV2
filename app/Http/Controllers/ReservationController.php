@@ -18,11 +18,51 @@ class ReservationController extends Controller
 {
     public function booking(Request $request)
     {
-        $table = TableRestaurant::where('restaurant_id', $request->restaurantId)
+        $request->validate([
+            'restaurantId' => 'required|exists:restaurants,id',
+            'guest' => 'required|integer|min:1',
+            'reservationDate' => 'required|date',
+            'reservationTime' => 'required',
+        ]);
+
+        $reservationDateTime = Carbon::parse($request->reservationDate . ' ' . $request->reservationTime);
+
+        // Cari meja yang memiliki kapasitas cukup di restoran yang dipilih
+        $tables = TableRestaurant::where('restaurant_id', $request->restaurantId)
             ->where('tableCapacity', '>=', $request->guest)
             ->where('availableTables', '>', 0)
             ->orderBy('tableCapacity', 'asc')
-            ->first();
+            ->get();
+
+        if ($tables->isEmpty()) {
+            return redirect()->back()->with('error', "There's no available table.");
+        }
+
+        $availableTable = null;
+
+        foreach ($tables as $table) {
+            // Tentukan durasi reservasi (misalnya 2 jam)
+            $reservationStart = $reservationDateTime->copy();
+            $reservationEnd = $reservationDateTime->copy()->addHours(2);
+
+            // Cek apakah ada reservasi yang bertabrakan dengan waktu yang dipilih
+            $overlappingReservations = Reservation::where('table_restaurant_id', $table->id)
+                ->where(function ($query) use ($reservationStart, $reservationEnd) {
+                    $query->whereRaw("CONCAT(reservationDate, ' ', reservationTime) <= ?", [$reservationEnd->format('Y-m-d H:i')])
+                        ->whereRaw("DATE_ADD(CONCAT(reservationDate, ' ', reservationTime), INTERVAL 2 HOUR) >= ?", [$reservationStart->format('Y-m-d H:i')]);
+                })
+                ->count();
+
+            if ($overlappingReservations < $table->availableTables) {
+                $availableTable = $table;
+                break;
+            }
+        }
+
+        if (!$availableTable) {
+            return redirect()->back()->with('error', "There's no available tables for the selected date and time.");
+        }
+
         $booking = new Reservation();
         $booking->user_id = auth()->id();
         $booking->guest = $request->guest;
@@ -31,7 +71,7 @@ class ReservationController extends Controller
         $booking->reservationTime = $request->reservationTime;
         $booking->restaurantName = $request->restaurantName;
         $booking->reservationStatus = 'On Going';
-        $booking->bookingCode = 'NER' . strtoupper(bin2hex(random_bytes(4))) . 'IN' . time();
+        $booking->bookingCode = 'NER' . strtoupper(bin2hex(random_bytes(4))) . 'IN';
         $booking->priceTotal = $request->priceTotal;
         $booking->restaurant_id = $request->restaurantId;
         $booking->table_restaurant_id = $table->id;
@@ -66,12 +106,10 @@ class ReservationController extends Controller
         }
 
         $booking->save();
-        $table->decrement('availableTables');
 
         // Data untuk email notifikasi
         $reservationData = [
             'id' => $booking->id,
-            // 'tableType' => $booking->tableType,
             'bookingCode' => $booking->bookingCode,
             'reservationDate' => $booking->reservationDate,
             'reservationTime' => $booking->reservationTime,
@@ -142,21 +180,49 @@ class ReservationController extends Controller
 
     public function cancelOrder($id)
     {
-        $reservation = Reservation::findOrFail($id);
-        if ($reservation->reservationStatus !== 'On Going') {
-            return response()->json([
-                'message' => 'Only ongoing reservations can be cancelled!'
-            ], 400);
+        // Temukan reservasi berdasarkan ID
+        $reservation = Reservation::find($id);
+
+        if (!$reservation) {
+            return response()->json(['message' => 'Reservation not found'], 404);
         }
 
+        // Ambil waktu reservasi dan waktu sekarang
+        $reservationDateTime = Carbon::parse($reservation->reservationDate . ' ' . $reservation->reservationTime);
+        $now = Carbon::now();
+
+        // Validasi pembatalan minimal 2 jam sebelum reservasi
+        if ($now->greaterThanOrEqualTo($reservationDateTime->subHours(1))) {
+            return response()->json(['message' => 'Reservations can only be cancelled at least 1 hours before the scheduled time.'], 400);
+        }
+
+        // Periksa apakah reservasi sudah dibatalkan sebelumnya
+        if ($reservation->reservationStatus === 'Cancelled') {
+            return response()->json(['message' => 'Reservation is already cancelled'], 400);
+        }
+
+        // Ambil data meja restoran yang sesuai dengan `table_restaurant_id`, `reservationDate`, dan `reservationTime`
+        $table = TableRestaurant::where('id', $reservation->table_restaurant_id)
+        ->whereHas('reservations', function ($query) use ($reservation) {
+            $query->where('reservationDate', $reservation->reservationDate)
+                ->where('reservationTime', $reservation->reservationTime);
+        })->first();
+
+        if ($table) {
+            // Tambahkan kembali jumlah meja yang tersedia sesuai dengan tanggal & jam booking
+            $table->increment('availableTables');
+        }
+
+        // Update status reservasi menjadi "Cancelled"
         $reservation->reservationStatus = 'Cancelled';
         $reservation->save();
 
         return response()->json([
-            'message' => 'Your reservation has been cancelled!',
-            'new_status' => $reservation->reservationStatus
+            'message' => 'Reservation cancelled successfully',
+            'availableTables' => $table ? $table->availableTables : 0 // Kembalikan jumlah meja yang tersedia
         ]);
     }
+
 
     public function finishOrder($id)
     {

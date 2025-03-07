@@ -148,7 +148,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             // Populate hidden input fields
             document.getElementById("hidden-guest-info").value =
-                "{{ $guestInfo }} guest(s) on {{ $areaInfo }}";
+                "{{ $guestInfo }} guest(s)";
             document.getElementById("hidden-reservation-info").value =
                 "{{ $reservationDate }}, {{ $reservationTime }}";
             document.getElementById("hidden-restaurant-name").value = "{!! $restaurantName !!}";
@@ -158,8 +158,13 @@
 
         function detailOrder() {
             const guestInfo = "{{ $guestInfo }}";
-            const areaInfo = "{{ $areaInfo }}";
-            const reservationDate = "{{ $reservationDate }}";
+            const bookDate = "{{ $reservationDate }}";
+            // const reservationDate = "{{ $reservationDate }}";
+            const reservationDate = new Date(bookDate).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
             const reservationTime = "{{ $reservationTime }}";
             const restaurantName = "{!! $restaurantName !!}";
             const restaurantCity = "{{ $restaurantCity }}";
@@ -206,12 +211,6 @@
             giForm.name = 'guestInfo';
             giForm.value = guestInfo;
             form.appendChild(giForm);
-
-            const aiForm = document.createElement('input');
-            aiForm.type = 'hidden';
-            aiForm.name = 'areaInfo';
-            aiForm.value = areaInfo;
-            form.appendChild(aiForm);
 
             const rdForm = document.createElement('input');
             rdForm.type = 'hidden';

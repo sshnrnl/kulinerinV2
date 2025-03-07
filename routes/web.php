@@ -56,6 +56,9 @@ Route::middleware(['customer'])->group(function () {
 
     Route::get('/searchRestaurant', [RestaurantController::class, 'searchRestaurant'])->name('searchRestaurant');
     Route::get('/restaurantIndex/{id}', [RestaurantController::class, 'indexRestaurants'])->name('indexRestaurants');
+    // Route::post('/available-tables', [RestaurantController::class, 'getAvailableTables']);
+    Route::post('/check-available-tables', [RestaurantController::class, 'checkAvailableTables'])->name('check.available.tables');
+
     Route::get('/logoutCustomer', [AuthController::class, 'logout'])->name('logoutCustomer');
     Route::post('logout', [AuthController::class, 'logout']);
 

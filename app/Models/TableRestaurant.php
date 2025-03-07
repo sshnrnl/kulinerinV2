@@ -9,8 +9,11 @@ class TableRestaurant extends Model
 {
     use HasFactory;
 
-    public function reservation()
+    protected $fillable = ['restaurant_id', 'tableCapacity', 'availableTables'];
+
+    // Tambahkan relasi ke reservations
+    public function reservations()
     {
-        return $this->belongsTo(Reservation::class, 'reservation_id');
+        return $this->hasMany(Reservation::class, 'table_restaurant_id', 'id');
     }
 }

@@ -215,10 +215,11 @@
                         <hr style="color: #FFF">
                         <div class="reservation-box">
                             <p class="mb-2">You are making a reservation for</p>
-                            <p class="mb-2">{{ $guestInfo }} guest(s) in {{ $areaInfo }}</p>
+                            <p class="mb-2">{{ $guestInfo }} guest(s)</p>
                             <p class="mb-2">At {!! $restaurantName !!} ({{ $restaurantCity }})</p>
                             <p class="mb-2">On {{ $reservationDate }}, {{ $reservationTime }}</p>
                         </div>
+
                     </div>
 
                     <!-- orderdetail.blade.php -->
@@ -400,6 +401,8 @@
     }
 
     function saveReservation() {
+        const rawDate = "{{ $reservationDate }}";
+        const formattedDate = new Date(rawDate).toISOString().split('T')[0];
 
         // Prepare reservation data
         const reservationData = {
@@ -407,9 +410,10 @@
             tableType: "{{ $areaInfo }}",
             restaurantName: "{!! $restaurantName !!}",
             restaurantCity: "{{ $restaurantCity }}",
-            reservationDate: "{{ $reservationDate }}",
+            // reservationDate: "{{ $reservationDate }}",
+            reservationDate: formattedDate,
             reservationTime: "{{ $reservationTime }}",
-            reservationStatus: "Confirmed",
+            reservationStatus: "On Going",
             menuData: "{{ $orderDataJson }}",
             priceTotal: "{{ $grandTotal }}",
             restaurantId: "{{ $restaurantId }}"

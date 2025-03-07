@@ -248,9 +248,14 @@
                                             {{ $reservation->restaurant->restaurantAddress ?? 'Address Not Available' }}
                                         </span>
                                     </p>
+                                    <p class="card-text mb-1 fst-italic">
+                                        Booking Code : {{ $reservation->bookingCode }}
+                                    </p>
                                     <p class="card-text mb-3 fst-italic">
-                                        Date: {{ \Carbon\Carbon::parse($reservation->reservationDate)->format('d-m-y') }} |
-                                        Time: {{ \Carbon\Carbon::parse($reservation->reservationTime)->format('H:i') }}
+                                        Date:
+                                        {{ \Carbon\Carbon::parse($reservation->reservationDate)->locale('en')->translatedFormat('j F Y') }}
+                                        |
+                                        Time: {{ \Carbon\Carbon::parse($reservation->reservationTime)->format('H:i') }} WIB
                                     </p>
                                     {{-- <p class="card-text mb-1">
                                     <strong>Guests:</strong> {{ $reservation->guest }}

@@ -22,9 +22,9 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
+                                        <th>Guest Name</th>
                                         <th>Guest</th>
-                                        <th>Table Area</th>
+                                        {{-- <th>Table Area</th> --}}
                                         <th>Date</th>
                                         <th>Time</th>
                                         <th>Status</th>
@@ -39,7 +39,7 @@
                                         <tr>
                                             <td>{{ $reservation->user->username }}</td>
                                             <td>{{ $reservation->guest }}</td>
-                                            <td>{{ $reservation->tableType }}</td>
+                                            {{-- <td>{{ $reservation->table_restaurant_id }}</td> --}}
                                             <td>{{ \Carbon\Carbon::parse($reservation->reservationDate)->format('d/m/y') }}
                                             </td>
                                             <td>{{ \Carbon\Carbon::parse($reservation->reservationTime)->format('H:i') }}

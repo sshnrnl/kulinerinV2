@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View | {{ $restaurants->restaurantName }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('asset/kulinerinLogo.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -308,12 +309,14 @@
                                 @endforeach
                             </select>
                         </div>
-                        <p>*Available Tables: <span id="availableTables">{{ $totalAvailableTables }}</span></p>
+                        <input type="hidden" name="restaurantId" value="{{ $restaurants->id }}">
+                        {{-- <p>*Available Tables: <span id="availableTables">{{ $totalAvailableTables }}</span></p> --}}
+                        <p><span id="availableTables"></span></p>
 
                         <div class="mb-3">
                             <label for="inputDate" class="form-label">Reservation Date</label>
-                            <input type="date" id="inputDate" name="reservationDate" class="form-control" required
-                                min="{{ date('Y-m-d') }}">
+                            <input type="date" id="inputDate" name="reservationDate" class="form-control"
+                                required="required" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}">
                         </div>
 
                         @php
@@ -339,8 +342,6 @@
                                 @endforeach
                             </select>
                         </div>
-
-
                         <div>
                             <input type="hidden" id="inputRestaurantName" name="restaurantName"
                                 value={{ $restaurants->restaurantName }}>
@@ -423,16 +424,6 @@
                 <p class="reservation-text" id="reservation-info"></p>
                 <div class="button-group">
                     <button class="button cancel-button" onclick="spanClick()">Cancel</button>
-                    {{-- <form action="{{ route('booking', $restaurants->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="guest" id="guest_hidden">
-                        <input type="hidden" name="tableType" id="area_hidden">
-                        <input type="hidden" name="restaurantName" id="inputRestaurantName"
-                            value="{{ $restaurants->restaurantName }}">
-                        <input type="hidden" name="reservationDate" id="date_hidden">
-                        <input type="hidden" name="reservationTime" id="time_hidden">
-                        <button type="submit" class="button book-button">Book Table</button>
-                    </form> --}}
                     <form action="{{ route('booking', $restaurants->id) }}" method="POST">
                         @csrf
                         <input type="hidden" name="guest" id="guest_hidden">
@@ -455,6 +446,106 @@
             </div>
         </div>
         <script>
+            //Clear Button buat reset date now
+            document.addEventListener("DOMContentLoaded", function() {
+                let dateInput = document.getElementById("inputDate");
+
+                dateInput.addEventListener("input", function() {
+                    if (!this.value) {
+                        let today = new Date().toISOString().split('T')[0];
+                        this.value = today;
+                    }
+                });
+            });
+
+            // document.getElementById('inputDate').addEventListener('change', function() {
+            //     let selectedDate = this.value;
+            //     const restaurantId = document.querySelector('input[name="restaurantId"]').value;
+
+            //     fetch('/available-tables', {
+            //             method: 'POST',
+            //             headers: {
+            //                 'Content-Type': 'application/json',
+            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+            //                     'content') // Laravel CSRF token
+            //             },
+            //             body: JSON.stringify({
+            //                 date: selectedDate,
+            //                 restaurant_id: restaurantId
+            //             }) // Kirim data sebagai JSON
+            //         })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             let availableTablesText = data.map(table =>
+            //                 `*Available Table(s) : Capacity: ${table.capacity}, Available: ${table.available}`
+            //             ).join("<br>");
+
+            //             document.getElementById('availableTables').innerHTML = availableTablesText;
+            //         })
+            //         .catch(error => console.error('Error fetching available tables:', error));
+            // });
+
+            //Cek Available Tables
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ambil nilai restaurant_id dari input hidden
+                const restaurantId = document.querySelector('input[name="restaurantId"]').value;
+
+                const guestSelect = document.getElementById('inputGuest');
+                const dateInput = document.getElementById('inputDate');
+                const timeSelect = document.getElementById('inputTime');
+                const availableTablesSpan = document.getElementById('availableTables');
+
+                function checkAvailableTables() {
+                    const guest = guestSelect.value;
+                    const reservationDate = dateInput.value;
+                    const reservationTime = timeSelect.value;
+
+                    if (!guest || !reservationDate || !reservationTime) {
+                        return;
+                    }
+
+                    fetch('/check-available-tables', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            },
+                            body: JSON.stringify({
+                                guest: guest,
+                                reservationDate: reservationDate,
+                                reservationTime: reservationTime,
+                                restaurant_id: restaurantId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch available tables');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            availableTablesSpan.innerHTML =
+                                `<strong><em>*Available Tables :</em></strong> <strong><em>${data.availableTables}</em></strong>`;
+                            // availableTablesSpan.textContent = data.availableTables;
+                        })
+                        .catch(error => {
+                            console.error('Error checking available tables:', error);
+                            availableTablesSpan.textContent = "Error!";
+                        });
+                }
+
+                // Event listener untuk setiap input
+                guestSelect.addEventListener('change', checkAvailableTables);
+                dateInput.addEventListener('change', checkAvailableTables);
+                timeSelect.addEventListener('change', checkAvailableTables);
+
+                // Panggil saat halaman pertama kali dimuat
+                checkAvailableTables();
+            });
+
+
+
             // Select all navigation links and sections
             const navLinks = document.querySelectorAll('nav a[href^="#"]');
             const sections = Array.from(document.querySelectorAll('section[id]'));
@@ -582,7 +673,7 @@
 
 
             function myBtnClick(event) {
-                //event.preventDefault(); // Prevent form submission
+                // event.preventDefault(); // Prevent form submission
                 // console.log("test")
                 const guestValue = inputGuest.value;
                 // const areaValue = inputArea.value;
@@ -655,11 +746,11 @@
                 giForm.value = guestInfo;
                 form.appendChild(giForm);
 
-                const aiForm = document.createElement('input');
-                aiForm.type = 'hidden';
-                aiForm.name = 'areaInfo';
-                aiForm.value = areaInfo;
-                form.appendChild(aiForm);
+                // const aiForm = document.createElement('input');
+                // aiForm.type = 'hidden';
+                // aiForm.name = 'areaInfo';
+                // aiForm.value = areaInfo;
+                // form.appendChild(aiForm);
 
                 const rdForm = document.createElement('input');
                 rdForm.type = 'hidden';

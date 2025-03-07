@@ -32,6 +32,6 @@ class Reservation extends Model
 
     public function tableRestaurant()
     {
-        return $this->belongsTo(TableRestaurant::class, 'table_restaurant_id');
+        return $this->belongsTo(TableRestaurant::class, 'table_restaurant_id', 'id');
     }
 }

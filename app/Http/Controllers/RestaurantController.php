@@ -134,7 +134,8 @@ class RestaurantController extends Controller
             $existingReservations = Reservation::where('table_restaurant_id', $table->id)
                 ->where(function ($query) use ($reservationStart, $reservationEnd) {
                     $query->whereRaw("CONCAT(reservationDate, ' ', reservationTime) <= ?", [$reservationEnd->format('Y-m-d H:i')])
-                        ->whereRaw("DATE_ADD(CONCAT(reservationDate, ' ', reservationTime), INTERVAL 2 HOUR) >= ?", [$reservationStart->format('Y-m-d H:i')]);
+                        ->whereRaw("DATE_ADD(CONCAT(reservationDate, ' ', reservationTime), INTERVAL 2 HOUR) >= ?", [$reservationStart->format('Y-m-d H:i')])
+                        ->where('reservationStatus', 'On Going');
                 })
                 ->count();
 

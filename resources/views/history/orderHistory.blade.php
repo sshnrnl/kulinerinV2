@@ -516,7 +516,7 @@
                             // Jika dikonfirmasi, jalankan AJAX
                             $.ajax({
                                 url: `/reservation/${reservationId}/cancel`,
-                                type: "POST",
+                                type: "DELETE",
                                 headers: {
                                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
                                         "content") // CSRF Token

@@ -10,7 +10,7 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'restaurant_id', 'guest', 'tableType', 'restaurantName',
+        'user_id', 'restaurant_id', 'table_restaurant_id', 'guest', 'tableType', 'restaurantName',
         'reservationDate', 'reservationTime', 'reservationStatus', 'bookingCode',
         'menuData', 'priceTotal'
     ];

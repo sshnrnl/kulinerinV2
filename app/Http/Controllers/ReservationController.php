@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Mail\ReceiptMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -191,26 +192,14 @@ class ReservationController extends Controller
         $reservationDateTime = Carbon::parse($reservation->reservationDate . ' ' . $reservation->reservationTime);
         $now = Carbon::now();
 
-        // Validasi pembatalan minimal 2 jam sebelum reservasi
+        // Validasi pembatalan minimal 1 jam sebelum reservasi
         if ($now->greaterThanOrEqualTo($reservationDateTime->subHours(1))) {
-            return response()->json(['message' => 'Reservations can only be cancelled at least 1 hours before the scheduled time.'], 400);
+            return response()->json(['message' => 'Reservations can only be cancelled at least 1 hour before the scheduled time.'], 400);
         }
 
         // Periksa apakah reservasi sudah dibatalkan sebelumnya
         if ($reservation->reservationStatus === 'Cancelled') {
             return response()->json(['message' => 'Reservation is already cancelled'], 400);
-        }
-
-        // Ambil data meja restoran yang sesuai dengan `table_restaurant_id`, `reservationDate`, dan `reservationTime`
-        $table = TableRestaurant::where('id', $reservation->table_restaurant_id)
-        ->whereHas('reservations', function ($query) use ($reservation) {
-            $query->where('reservationDate', $reservation->reservationDate)
-                ->where('reservationTime', $reservation->reservationTime);
-        })->first();
-
-        if ($table) {
-            // Tambahkan kembali jumlah meja yang tersedia sesuai dengan tanggal & jam booking
-            $table->increment('availableTables');
         }
 
         // Update status reservasi menjadi "Cancelled"
@@ -219,10 +208,8 @@ class ReservationController extends Controller
 
         return response()->json([
             'message' => 'Reservation cancelled successfully',
-            'availableTables' => $table ? $table->availableTables : 0 // Kembalikan jumlah meja yang tersedia
         ]);
     }
-
 
     public function finishOrder($id)
     {

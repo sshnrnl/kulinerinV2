@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');
             $table->unsignedBigInteger('table_restaurant_id');
-            $table->foreign('table_restaurant_id')->references('id')->on('table_restaurants');
+            $table->foreign('table_restaurant_id')->references('id')->on('table_restaurants')->constrained()->onDelete('cascade');
             $table->integer("guest");
             // $table->string("tableType");
             $table->string("restaurantName")->nullable();

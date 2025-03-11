@@ -25,7 +25,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="{{ route('table') }}" class="nav-link {{ Request::routeIs('table') ? 'active' : '' }}">
+            <a href="{{ route('table.index') }}" class="nav-link {{ Request::routeIs('table.index') ? 'active' : '' }}">
                 <i class="bi bi-table"></i>
                 <span class="nav-text">Table</span>
             </a>

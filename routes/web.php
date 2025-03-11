@@ -11,6 +11,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RatingRestaurantController;
+use App\Http\Controllers\TableRestaurantController;
 use Illuminate\Http\Request;
 
 /*
@@ -72,7 +73,8 @@ Route::middleware(['customer'])->group(function () {
 
     Route::get('/history', [ReservationController::class, 'history'])->name('history');
     Route::post('/history', [ReservationController::class, 'filterDate'])->name('filter');
-    Route::post('/reservation/{id}/cancel', [ReservationController::class, 'cancelOrder'])->name('reservation.cancelOrder');
+    Route::delete('/reservation/{id}/cancel', [ReservationController::class, 'cancelOrder'])->name('reservation.cancelOrder');
+    // Route::get('/auto-cancel-reservations', [ReservationController::class, 'cancelOrder']);
     Route::post('/reservation/{id}/finish', [ReservationController::class, 'finishOrder'])->name('reservation.finishOrder');
     Route::post('/rating/store', [RatingRestaurantController::class, 'store'])->name('rating.store');
 
@@ -99,9 +101,12 @@ Route::middleware(['restaurant'])->group(function () {
     Route::get('/restaurant/reservation', [ReservationController::class, 'restaurantReservations'])->name('restaurant.reservations');
     Route::post('/reservation/{id}/confirm-arrival', [ReservationController::class, 'confirmArrival'])->name('reservation.confirmArrival');
 
-    Route::get('/table', function () {
-        return view('restaurant.table.index');
-    })->name('table');
+    //TABLE
+    Route::get('/table', [TableRestaurantController::class, 'index'])->name('table.index');
+    Route::delete('/table/{id}', [TableRestaurantController::class, 'destroy'])->name('table.destroy');
+    // Route::get('/menu/{id}/edit', [MenuRestaurantController::class, 'edit'])->name('menu.edit');
+    // Route::post('/menu/{id}/update', [MenuRestaurantController::class, 'update'])->name('menu.update');
+    // Route::post('/addMenu', [MenuRestaurantController::class, 'store'])->name('menu.store');
 
     Route::get('/order', function () {
         return view('restaurant.order.index');

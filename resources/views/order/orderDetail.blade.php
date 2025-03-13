@@ -402,8 +402,10 @@
 
     function saveReservation() {
         const rawDate = "{{ $reservationDate }}";
-        const formattedDate = new Date(rawDate).toISOString().split('T')[0];
+        const date = new Date(rawDate);
+        const formattedDate = date.toLocaleDateString('en-CA');
 
+        // console.log(formattedDate);
         // Prepare reservation data
         const reservationData = {
             guest: "{{ $guestInfo }}",

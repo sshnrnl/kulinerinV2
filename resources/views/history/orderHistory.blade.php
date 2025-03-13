@@ -86,6 +86,12 @@
             /* Space for the rating */
         }
 
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
         /* Rating positioning */
         .rating-container {
             position: absolute;

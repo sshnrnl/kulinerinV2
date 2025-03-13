@@ -12,6 +12,8 @@ use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RatingRestaurantController;
 use App\Http\Controllers\TableRestaurantController;
+use App\Http\Controllers\RedemptionController;
+use App\Http\Controllers\RewardController;
 use Illuminate\Http\Request;
 
 /*
@@ -77,6 +79,13 @@ Route::middleware(['customer'])->group(function () {
     // Route::get('/auto-cancel-reservations', [ReservationController::class, 'cancelOrder']);
     Route::post('/reservation/{id}/finish', [ReservationController::class, 'finishOrder'])->name('reservation.finishOrder');
     Route::post('/rating/store', [RatingRestaurantController::class, 'store'])->name('rating.store');
+
+    //REWARD
+    Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
+    Route::post('/rewards/{id}/redeem', [RedemptionController::class, 'redeem'])->name('rewards.redeem');
+    Route::get('/redemptions/{redemption}/success', [RedemptionController::class, 'success'])->name('rewards.redemption.success');
+    Route::get('/redemptions/history', [RedemptionController::class, 'history'])->name('rewards.redemption.history');
+
 
 });
 

@@ -12,6 +12,8 @@ use App\Models\Receipt;
 use App\Models\Reservation;
 use App\Models\Restaurant;
 use App\Models\TableRestaurant;
+use App\Models\PointLoyalty;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -161,7 +163,8 @@ class ReservationController extends Controller
     public function history()
     {
         // Ambil user yang sedang login
-        $user = Auth::user();
+        // $user = Auth::user();
+        $user = User::where('id', Auth::id())->first();
 
         // Cek apakah user sudah login
         if (!$user) {
@@ -214,6 +217,9 @@ class ReservationController extends Controller
     public function finishOrder($id)
     {
         $reservation = Reservation::findOrFail($id);
+        // Log::info("Finish Order, Data : " . $reservation);
+        $user = User::where('id', Auth::id())->first();
+
         if ($reservation->reservationStatus !== 'Arrived') {
             return response()->json([
                 'message' => 'Only ongoing reservations can be cancelled!'
@@ -222,6 +228,18 @@ class ReservationController extends Controller
 
         $reservation->reservationStatus = 'Finished';
         $reservation->save();
+
+        $earnedPoints = floor($reservation->priceTotal / 10000); // 1 point per Rp10.000
+
+        // Log::info("Point yang didapatkan : " . $earnedPoints);
+        if ($earnedPoints > 0) {
+            PointLoyalty::updateOrCreate(
+                ['user_id' => $user->id],
+                ['point' => DB::raw("point + $earnedPoints")] // Tambahkan poin ke nilai sebelumnya
+            );
+
+            // Log::info("User {$user->id} mendapatkan {$earnedPoints} poin dari reservasi #{$reservation->id}");
+        }
 
         return response()->json([
             'message' => 'Your reservation has been Finished!',

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'google_id',
+        'points',
     ];
 
     /**
@@ -49,5 +50,13 @@ class User extends Authenticatable
     public function ratingRestaurants()
     {
         return $this->hasMany(RatingRestaurant::class, 'user_id');
+    }
+    public function redemptions()
+    {
+        return $this->hasMany(Redemption::class);
+    }
+    public function pointLoyalties()
+    {
+        return $this->hasMany(PointLoyalty::class);
     }
 }

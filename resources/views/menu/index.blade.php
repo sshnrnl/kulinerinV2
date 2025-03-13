@@ -159,6 +159,7 @@
         function detailOrder() {
             const guestInfo = "{{ $guestInfo }}";
             const bookDate = "{{ $reservationDate }}";
+            console.log(bookDate);
             // const reservationDate = "{{ $reservationDate }}";
             const reservationDate = new Date(bookDate).toLocaleDateString('en-GB', {
                 day: 'numeric',

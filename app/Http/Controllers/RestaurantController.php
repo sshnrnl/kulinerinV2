@@ -8,6 +8,7 @@ use App\Models\MenuRestaurant;
 use App\Models\RatingRestaurant;
 use App\Models\Reservation;
 use App\Models\TableRestaurant;
+use App\Models\OperationalHour;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -78,6 +79,8 @@ class RestaurantController extends Controller
         ->groupBy('category');
         $images = explode(', ', $restaurants->restaurantImage);
 
+        $operationalHour = Restaurant::with('operationalHours')->find($id);
+
         $ratingData = $this->getRating($id);
 
         // Ambil kapasitas tertinggi dari meja yang tersedia
@@ -93,7 +96,7 @@ class RestaurantController extends Controller
         $totalAvailableTables = TableRestaurant::where('restaurant_id', $id)
             ->sum('availableTables');
 
-        return view('index.restaurantIndex', compact('restaurants', 'ratingData', 'images', 'menuItems', 'capacities', 'totalAvailableTables'));
+        return view('index.restaurantIndex', compact('restaurants', 'ratingData', 'images', 'menuItems', 'capacities', 'totalAvailableTables', 'operationalHour'));
     }
 
     public function checkAvailableTables(Request $request)

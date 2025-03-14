@@ -9,6 +9,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
+    body {
+        background-color: #DECEB0ff;
+        width: 100%;
+        min-height: 100vh;
+    }
+
     .card img {
         max-height: 150px;
         /* object-fit: cover; */
@@ -66,7 +72,7 @@
 @extends('master.masterCustomer')
 @section('content')
 
-    <body class="bg-light">
+    <body>
         <div class="container mt-4">
             <ul class="nav nav-pills">
                 {{-- <li class="nav-item">
@@ -106,12 +112,13 @@
                         <div class="col-12 col-sm-6 col-md-4" style="padding-top: 1rem;">
                             <div class="card h-100 d-flex flex-column">
                                 <div class="row g-0 h-100">
-                                    <div class="col-5">
+                                    <div class="col-5 h-100 d-flex">
                                         <img src="{{ asset('storage/' . $menu->menuImage) }}"
                                             class="img-fluid rounded-start"
-                                            style="width: 100%; height: 100%; object-fit: cover;" alt="Menu Image">
+                                            style="width: 100%; height: 100%; object-fit: cover; min-height: 100%;"
+                                            alt="Menu Image">
                                     </div>
-                                    <div class="col-7 d-flex flex-column justify-content-between">
+                                    <div class="col-7 d-flex flex-column justify-content-between h-100">
                                         <div class="card-body">
                                             <h5 class="card-title" id="menuName">{{ $menu->menuName }}</h5>
                                             <p class="card-text small">{{ $menu->description }}</p>

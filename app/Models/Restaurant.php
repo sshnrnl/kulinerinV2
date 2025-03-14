@@ -23,4 +23,9 @@ class Restaurant extends Model
         return $this->hasMany(MenuRestaurant::class, 'restaurant_id');
     }
 
+    public function operationalHours()
+    {
+        return $this->hasMany(OperationalHour::class, 'restaurant_id');
+    }
+
 }

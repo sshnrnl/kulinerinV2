@@ -319,27 +319,9 @@
                                 required="required" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}">
                         </div>
 
-                        @php
-                            use Carbon\Carbon;
-                            $currentTime = Carbon::now()->format('H:i');
-                            $currentHour = Carbon::now()->hour;
-                            $currentMinute = Carbon::now()->minute;
-                        @endphp
-
                         <div class="mb-3">
                             <label for="inputTime" class="form-label">Reservation Time</label>
                             <select id="inputTime" name="reservationTime" class="form-control" required>
-                                {{-- <option value="">Select Time</option> --}}
-                                @foreach (range(0, 23) as $hour)
-                                    @foreach (['00', '15', '30', '45'] as $minute)
-                                        @php
-                                            $time = sprintf('%02d:%s', $hour, $minute);
-                                        @endphp
-                                        @if ($hour > $currentHour || ($hour == $currentHour && (int) $minute > $currentMinute))
-                                            <option value="{{ $time }}">{{ $time }} WIB</option>
-                                        @endif
-                                    @endforeach
-                                @endforeach
                             </select>
                         </div>
                         <div>
@@ -458,43 +440,99 @@
                 });
             });
 
-            // document.getElementById('inputDate').addEventListener('change', function() {
-            //     let selectedDate = this.value;
-            //     const restaurantId = document.querySelector('input[name="restaurantId"]').value;
-
-            //     fetch('/available-tables', {
-            //             method: 'POST',
-            //             headers: {
-            //                 'Content-Type': 'application/json',
-            //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-            //                     'content') // Laravel CSRF token
-            //             },
-            //             body: JSON.stringify({
-            //                 date: selectedDate,
-            //                 restaurant_id: restaurantId
-            //             }) // Kirim data sebagai JSON
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             let availableTablesText = data.map(table =>
-            //                 `*Available Table(s) : Capacity: ${table.capacity}, Available: ${table.available}`
-            //             ).join("<br>");
-
-            //             document.getElementById('availableTables').innerHTML = availableTablesText;
-            //         })
-            //         .catch(error => console.error('Error fetching available tables:', error));
-            // });
-
-            //Cek Available Tables
             document.addEventListener('DOMContentLoaded', function() {
-                // Ambil nilai restaurant_id dari input hidden
+                // Ambil semua element yang dibutuhkan
                 const restaurantId = document.querySelector('input[name="restaurantId"]').value;
-
                 const guestSelect = document.getElementById('inputGuest');
                 const dateInput = document.getElementById('inputDate');
                 const timeSelect = document.getElementById('inputTime');
                 const availableTablesSpan = document.getElementById('availableTables');
 
+                // Function untuk update time slots berdasarkan tanggal yang dipilih
+                function updateTimeSlots() {
+                    const selectedDate = dateInput.value;
+                    const today = '{{ date('Y-m-d') }}';
+                    const currentHour = {{ (int) date('H') }};
+                    const currentMinute = {{ (int) date('i') }};
+
+                    // Clear existing options
+                    timeSelect.innerHTML = ''; // Kosongkan pilihan tanpa opsi default
+
+                    // Get day of week from selected date
+                    const date = new Date(selectedDate);
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const dayOfWeek = days[date.getDay()];
+
+                    // Fetch operational hours via AJAX
+                    fetch(`/api/operational-hours/${dayOfWeek}/${restaurantId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.operational_hours) {
+                                const openTime = data.operational_hours.open_time.split(':');
+                                const closeTime = data.operational_hours.close_time.split(':');
+
+                                const openHour = parseInt(openTime[0]);
+                                const openMinute = parseInt(openTime[1]);
+                                const closeHour = parseInt(closeTime[0]);
+                                const closeMinute = parseInt(closeTime[1]);
+
+                                // Flag to track if we added any options
+                                let optionsAdded = false;
+
+                                // Generate time slots in 15-minute intervals
+                                for (let hour = openHour; hour <= closeHour; hour++) {
+                                    for (let minuteIdx = 0; minuteIdx < 4; minuteIdx++) {
+                                        const minute = ['00', '15', '30', '45'][minuteIdx];
+
+                                        // Skip if we're past the closing time
+                                        if (hour === closeHour && parseInt(minute) >= closeMinute) {
+                                            continue;
+                                        }
+
+                                        // Skip if we're before the opening time
+                                        if (hour === openHour && parseInt(minute) < openMinute) {
+                                            continue;
+                                        }
+
+                                        // For today, skip times that have already passed
+                                        if (selectedDate === today) {
+                                            if (hour < currentHour || (hour === currentHour && parseInt(minute) <=
+                                                    currentMinute)) {
+                                                continue;
+                                            }
+                                        }
+
+                                        const timeStr = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                        const option = document.createElement('option');
+                                        option.value = timeStr;
+                                        option.textContent = `${timeStr} WIB`;
+                                        timeSelect.appendChild(option);
+                                        optionsAdded = true;
+                                    }
+                                }
+
+                                // After updating time slots, check available tables if time is selected
+                                if (optionsAdded) {
+                                    // Auto-select the first option and trigger the check
+                                    if (timeSelect.options.length > 0) {
+                                        timeSelect.selectedIndex = 0;
+                                        checkAvailableTables();
+                                    }
+                                } else {
+                                    availableTablesSpan.innerHTML =
+                                        "<strong><em>*No Available Time Slots</em></strong>";
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching operational hours:', error);
+                            const option = document.createElement('option');
+                            option.textContent = 'Error loading time slots';
+                            timeSelect.appendChild(option);
+                        });
+                }
+
+                // Function untuk cek available tables
                 function checkAvailableTables() {
                     const guest = guestSelect.value;
                     const reservationDate = dateInput.value;
@@ -527,24 +565,21 @@
                         .then(data => {
                             availableTablesSpan.innerHTML =
                                 `<strong><em>*Available Tables :</em></strong> <strong><em>${data.availableTables}</em></strong>`;
-                            // availableTablesSpan.textContent = data.availableTables;
                         })
                         .catch(error => {
                             console.error('Error checking available tables:', error);
-                            availableTablesSpan.textContent = "Error!";
+                            availableTablesSpan.textContent = "Error checking available tables!";
                         });
                 }
 
-                // Event listener untuk setiap input
+                // Event listeners
                 guestSelect.addEventListener('change', checkAvailableTables);
-                dateInput.addEventListener('change', checkAvailableTables);
+                dateInput.addEventListener('change', updateTimeSlots);
                 timeSelect.addEventListener('change', checkAvailableTables);
 
-                // Panggil saat halaman pertama kali dimuat
-                checkAvailableTables();
+                // Initialize on page load
+                updateTimeSlots();
             });
-
-
 
             // Select all navigation links and sections
             const navLinks = document.querySelectorAll('nav a[href^="#"]');

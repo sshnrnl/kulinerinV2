@@ -24,3 +24,13 @@ Route::post("/generateAsymmetricSignature", [MidtransController::class, 'generat
 Route::post("/getB2BToken", [MidtransController::class, 'getB2BToken']);
 Route::post("/generateQris", [MidtransController::class, 'generateQris']);
 Route::post("/checkStatus", [MidtransController::class, 'checkStatus']);
+
+Route::get('/operational-hours/{day}/{restaurant_id}', function ($day, $restaurant_id) {
+    $operationalHours = App\Models\OperationalHour::where('restaurant_id', $restaurant_id)
+        ->where('day', $day)
+        ->first();
+
+    return response()->json([
+        'operational_hours' => $operationalHours
+    ]);
+});

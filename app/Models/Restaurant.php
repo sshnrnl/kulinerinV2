@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Restaurant extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'user_id',
+        'restaurantName',
+        'restaurantPhoneNumber',
+        'restaurantCity',
+        'restaurantAddress',
+        'restaurantDescription',
+        'restaurantStyle',
+        'restaurantImage'
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -27,5 +37,4 @@ class Restaurant extends Model
     {
         return $this->hasMany(OperationalHour::class, 'restaurant_id');
     }
-
 }

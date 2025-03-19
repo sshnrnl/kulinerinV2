@@ -1,4 +1,5 @@
-body, html {
+body,
+html {
     height: 100%;
     margin: 0;
     font-family: Arial, sans-serif;
@@ -9,22 +10,30 @@ body, html {
 /* Container for centering content */
 .container {
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center;     /* Center vertically */
-    height: 100%;             /* Full height */
-    flex-direction: column;  /* Stack content vertically */
-    text-align: center;      /* Center text */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    height: 100%;
+    /* Full height */
+    flex-direction: column;
+    /* Stack content vertically */
+    text-align: center;
+    /* Center text */
 }
 
 /* Styling for the logo container */
 .logo-container {
-    margin-bottom: 0px; /* Reduced space between logo and login form */
-    margin-top:-50px;
+    margin-bottom: 0px;
+    /* Reduced space between logo and login form */
+    margin-top: -50px;
 }
 
 .logo-container img {
-    max-width: 120px; /* Limit logo size */
-    height: auto;     /* Maintain aspect ratio */
+    max-width: 120px;
+    /* Limit logo size */
+    height: auto;
+    /* Maintain aspect ratio */
 }
 
 /* Login form styling */
@@ -37,6 +46,8 @@ body, html {
     width: 100%;
     max-width: 400px;
     text-align: center;
+    max-height: 60vh;
+    overflow-y: scroll;
 }
 
 /* Input fields styling */
@@ -44,7 +55,9 @@ body, html {
     margin-bottom: 20px;
     text-align: left;
 }
-.input-group input {
+
+.input-group input,
+textarea {
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -52,6 +65,7 @@ body, html {
     border-radius: 6px;
     box-sizing: border-box;
 }
+
 .input-group input:focus {
     border-color: #D67B47ff;
     outline: none;
@@ -118,6 +132,7 @@ body, html {
 .backbutton:hover {
     background-color: #B76C3D;
 }
+
 /* Link to sign up */
 .signup-link {
     margin-top: 20px;
@@ -144,6 +159,6 @@ body, html {
     font-size: 14px;
 }
 
-.scrol{
+.scrol {
     margin-top: 120px;
 }

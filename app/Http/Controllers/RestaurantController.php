@@ -9,8 +9,14 @@ use App\Models\RatingRestaurant;
 use App\Models\Reservation;
 use App\Models\TableRestaurant;
 use App\Models\OperationalHour;
+use Illuminate\Support\Str;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+
 
 
 class RestaurantController extends Controller
@@ -74,9 +80,9 @@ class RestaurantController extends Controller
     {
         $restaurants = Restaurant::findOrFail($id);
         $menuItems = MenuRestaurant::where('restaurant_id', $id)
-        ->orderBy('category')
-        ->get()
-        ->groupBy('category');
+            ->orderBy('category')
+            ->get()
+            ->groupBy('category');
         $images = explode(', ', $restaurants->restaurantImage);
 
         $operationalHour = Restaurant::with('operationalHours')->find($id);
@@ -198,11 +204,75 @@ class RestaurantController extends Controller
     public function indexMenu($id)
     {
         $menuItems = MenuRestaurant::where('restaurant_id', $id)
-        ->orderBy('category')
-        ->get()
-        ->groupBy('category');
+            ->orderBy('category')
+            ->get()
+            ->groupBy('category');
         $restaurants = Restaurant::find($id);
 
-        return view('menu.index', compact( 'menuItems','restaurants'));
+        return view('menu.index', compact('menuItems', 'restaurants'));
+    }
+
+    public function settings()
+    {
+        $user = Auth::user();
+
+        // if (!$user) {
+        //     return redirect('/login')->with('error', 'Please log in first.');
+        // }
+
+        $restaurant = Restaurant::where('user_id', $user->id)->first();
+
+        // if (!$restaurant) {
+        //     return redirect('/dashboard')->with('error', 'Restaurant not found.');
+        // }
+
+        return view('restaurant.settings.index', compact('restaurant'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'number' => 'required|string|max:20',
+            'city' => 'required|string|max:100',
+            'address' => 'required|string|max:255',
+            'desc' => 'required|string',
+            'style' => 'required|string|in:Asian,Western,Fine Dining,Bar',
+            'image' => 'nullable|array', // Allow partial image uploads
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $user = auth()->user();
+        $restaurant = Restaurant::findOrFail($id);
+        $restaurantNameSlug = Str::slug($request->name);
+
+        // Update restaurant details
+        $restaurant->restaurantName = $request->name;
+        $restaurant->restaurantPhoneNumber = $request->number;
+        $restaurant->restaurantCity = $request->city;
+        $restaurant->restaurantAddress = $request->address;
+        $restaurant->restaurantDescription = $request->desc;
+        $restaurant->restaurantStyle = $request->style;
+
+        // Get existing images
+        $existingImages = $request->input('existing_images', []); // Read hidden inputs
+        $existingImages = array_map(fn($img) => $img === 'null' ? null : $img, $existingImages);
+
+        // Upload new images while keeping the structure
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $index => $image) {
+                $extension = $image->getClientOriginalExtension();
+                $filename = "{$user->id}-{$restaurantNameSlug}" . ($index === 0 ? '' : $index) . ".{$extension}";
+                $image->move(public_path('storage/restaurant'), $filename);
+                $existingImages[$index] = "restaurant/" . $filename; // Replace only the uploaded slot
+            }
+        }
+
+        // Convert array to a comma-separated string for database storage
+        $restaurant->restaurantImage = implode(',', $existingImages);
+
+        $restaurant->save();
+
+        return redirect()->back()->with('success', 'Restaurant details updated successfully!');
     }
 }

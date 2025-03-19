@@ -12,6 +12,8 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'temp_email',
+        'temp_username',
+        'temp_password',
     ];
 }

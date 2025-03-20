@@ -44,11 +44,14 @@ Route::middleware(['guest'])->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 
-    Route::post('register', [AuthController::class, 'register']);
+    // Route::post('register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('web');
 
-    Route::get('/registerrestaurant', [AuthController::class, 'showRegisterRestaurantForm'])->name('registerRestaurant');
+    // Route::get('/registerrestaurant', [AuthController::class, 'showRegisterRestaurantForm'])->name('registerRestaurant');
+    // Route::post('registerrestaurant', [AuthController::class, 'registerestaurant']);
 
-    Route::post('registerrestaurant', [AuthController::class, 'registerestaurant']);
+    Route::get('/registerrestaurant', [AuthController::class, 'showRegisterRestaurantForm'])->name('registerRestaurant.form');
+    Route::post('/registerrestaurant', [AuthController::class, 'postRegisterRestaurant'])->name('registerRestaurant.post');
 
     Route::get('/search', [GuestController::class, 'searchRestaurantbyGuest'])->name('search');
 });
@@ -85,8 +88,6 @@ Route::middleware(['customer'])->group(function () {
     Route::post('/rewards/{id}/redeem', [RedemptionController::class, 'redeem'])->name('rewards.redeem');
     Route::get('/redemptions/{redemption}/success', [RedemptionController::class, 'success'])->name('rewards.redemption.success');
     Route::get('/redemptions/history', [RedemptionController::class, 'history'])->name('rewards.redemption.history');
-
-
 });
 
 Route::middleware(['admin'])->group(function () {
@@ -110,6 +111,8 @@ Route::middleware(['restaurant'])->group(function () {
 
     Route::get('/restaurantDashboard', [AuthController::class, 'restaurantDashboard'])->name('restaurantDashboard');
 
+    //UPDATE RESTAURANT SETTINGS
+    Route::put('/restaurant/{id}', [RestaurantController::class, 'update'])->name('restaurant.update');
     //MANAGE MENU
     Route::get('/menu', [MenuRestaurantController::class, 'index'])->name('menu.index');
     Route::delete('/menu/{id}', [MenuRestaurantController::class, 'destroy'])->name('menu.destroy');
@@ -140,9 +143,7 @@ Route::middleware(['restaurant'])->group(function () {
         return view('restaurant.report.index');
     })->name('report');
 
-    Route::get('/settings', function () {
-        return view('restaurant.home.index');
-    })->name('settings');
+    Route::get('/settings', [RestaurantController::class, 'settings'])->name('settings');
 
     Route::get('/logoutRestaurant', [AuthController::class, 'logout'])->name('logoutRestaurant');
     Route::post('logout', [AuthController::class, 'logout']);

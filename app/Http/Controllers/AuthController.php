@@ -7,6 +7,7 @@ use App\Models\Restaurant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Redirect;
+use Illuminate\Support\Facades\Log;
 use Flasher\Toastr\Prime\ToastrInterface;
 use Laravel\Socialite\Facades\Socialite;
 use App\Providers\RouteServiceProvider;
@@ -74,6 +75,14 @@ class AuthController extends Controller
             'confirmation_password' => 'required',
         ]);
 
+        if ($request->register_as_restaurant == "1") {
+            return redirect('/registerrestaurant')
+                ->withCookie(cookie('temp_email', $request->email, 10, '/', null, false, false))
+                ->withCookie(cookie('temp_username', $request->username, 10, '/', null, false, false))
+                ->withCookie(cookie('temp_password', bcrypt($request->password), 10, '/', null, false, false));
+        }
+
+
         $user = new User();
         $user->email = $request->email;
         $user->username = $request->username;
@@ -83,6 +92,80 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Your account has been created!');
     }
+
+    //Restaurant by VEPEHA
+
+    public function postRegisterRestaurant(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users',
+            'username' => 'required|unique:users',
+            'password' => 'required',
+            'name' => 'required',
+            'number' => 'required',
+            'city' => 'required',
+            'address' => 'required',
+            'style' => 'required|string|in:Asian,Western,Fine Dining,Bar',
+            'desc' => 'required',
+            'image' => 'required|array|min:3', // Ensure at least 3 images
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Image validation
+        ]);
+
+        // Create user account
+        $user = User::create([
+            'email' => $request->email,
+            'username' => $request->username,
+            'password' => $request->password,
+            'role' => 2, // Assuming 2 is for users
+        ]);
+
+        // Prepare restaurant name for filename (replace spaces with dashes)
+        $restaurantNameSlug = str_replace(' ', '-', strtolower($request->name));
+        $imagePaths = [];
+
+        foreach ($request->file('image') as $index => $image) {
+            $extension = $image->getClientOriginalExtension();
+            $filename = "{$user->id}-{$restaurantNameSlug}" . ($index === 0 ? '' : $index) . ".{$extension}";
+
+            try {
+                $image->move(public_path('storage/restaurant'), $filename); // Move to public/images/restaurant
+                Log::info("Uploaded: " . public_path("storage/restaurant/{$filename}"));
+                $imagePaths[] = "restaurant/{$filename}"; // Save relative path
+            } catch (\Exception $e) {
+                Log::error("Upload failed: " . $e->getMessage());
+            }
+        }
+
+
+
+        // Create restaurant account linked to the user
+        Restaurant::create([
+            'user_id' => $user->id,
+            'restaurantName' => $request->name,
+            'restaurantPhoneNumber' => $request->number,
+            'restaurantCity' => $request->city,
+            'restaurantAddress' => $request->address,
+            'restaurantDescription' => $request->desc,
+            'restaurantStyle' => $request->style,
+            'restaurantImage' => implode(', ', $imagePaths), // Store as comma-separated paths
+        ]);
+
+        return redirect('/login')->with('success', 'Your restaurant account has been created!');
+    }
+
+    public function settings()
+    {
+        // Get the authenticated user
+        $user = auth()->user();
+
+        // Fetch the restaurant data linked to the user
+        $restaurant = Restaurant::where('user_id', $user->id)->first();
+
+        // Pass it to the view
+        return view('dashboard.settings', compact('restaurant'));
+    }
+
+    //////////////////////////
 
     public function showLoginForm()
     {

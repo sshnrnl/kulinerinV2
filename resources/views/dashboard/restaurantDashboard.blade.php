@@ -89,6 +89,23 @@
             margin-left: 80px;
         }
 
+        .input-group input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        #settings_form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 80px;

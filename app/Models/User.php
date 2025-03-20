@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'google_id',
         'points',
+        'role' //IMPORTANT FOR RESTAURANT AND CUSTOMER DIFFERENTIATION
     ];
 
     /**

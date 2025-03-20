@@ -217,7 +217,7 @@
                             <p class="mb-2">You are making a reservation for</p>
                             <p class="mb-2">{{ $guestInfo }} guest(s)</p>
                             <p class="mb-2">At {!! $restaurantName !!} ({{ $restaurantCity }})</p>
-                            <p class="mb-2">On {{ $reservationDate }}, {{ $reservationTime }}</p>
+                            <p class="mb-2">On {{ $reservationDate }}, {{ $reservationTime }} WIB</p>
                         </div>
 
                     </div>

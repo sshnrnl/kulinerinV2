@@ -20,6 +20,56 @@ class TableRestaurantController extends Controller
         return view('restaurant.table.index', compact('tableRestaurant'));
     }
 
+    public function edit($id)
+    {
+        $table = TableRestaurant::findOrFail($id);
+        // dd($table);
+        return response()->json($table);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'tableCapacity' => 'required|integer|min:1',
+            'availableTables' => 'required|integer|min:0',
+        ],[
+            'tableCapacity.required' => 'Table Capacity is Missing',
+            'availableTables.required' => 'Available Table is Missing',
+        ]);
+
+        $table = TableRestaurant::findOrFail($id);
+        $table->update([
+            'tableCapacity' => $request->tableCapacity,
+            'availableTables' => $request->availableTables,
+        ]);
+
+        return response()->json(['message' => 'Table updated successfully']);
+    }
+
+    public function store(Request $request)
+    {
+        $restaurant = Restaurant::where('user_id', Auth::user()->id)->first();
+        $request->validate([
+            'tableCapacity' => 'required|integer|min:1',
+            'availableTables' => 'required|integer|min:0',
+        ],[
+            'tableCapacity.required' => 'Table Capacity is Missing',
+            'availableTables.required' => 'Available Table is Missing',
+        ]);
+
+        $table = new TableRestaurant();
+        $table->restaurant_id = $restaurant->id;
+        $table->tableCapacity = $request->tableCapacity;
+        $table->availableTables = $request->availableTables;
+        $table->save();
+
+        return response()->json([
+            'message' => 'Table added successfully!',
+            'table' => $table
+        ], 201);
+
+    }
+
     public function destroy($id)
     {
         $table = TableRestaurant::findOrFail($id);

@@ -38,7 +38,7 @@
                 <div class="dropdown-content">
                     <a href="/dashboardCustomer" class="nav-link">Dashboard</a>
                     <a href="{{ route('history') }}">History</a>
-                    <a href="{{ route('rewards.index') }}">Redeem Reward</a>
+                    <a href="{{ route('rewards.show') }}">Redeem Reward</a>
                     {{-- <a href="#">Settings</a>
                     <a href="#">Help</a> --}}
                     <a href="{{ route('logoutCustomer') }}">Sign Out</a>

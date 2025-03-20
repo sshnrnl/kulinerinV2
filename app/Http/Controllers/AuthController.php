@@ -109,8 +109,8 @@ class AuthController extends Controller
                 // ->withSuccess('Login Success');
             } else if ($user->role == 3) {
                 // toastr()->success('Login Success');
-                // return redirect()->route('restaurantDashboard')->withSuccess('Login Success');
-                return view('dashboard.adminDashboard')->withSuccess('Login Success');
+                // return view('dashboard.adminDashboard')->withSuccess('Login Success');
+                return redirect()->route('adminDashboard')->withSuccess('Login Success');
             } else if ($user->role == 2) {
                 // toastr()->success('Login Success');
                 return redirect()->route('restaurantDashboard')->withSuccess('Login Success');
@@ -124,7 +124,7 @@ class AuthController extends Controller
     }
     public function adminDashboard()
     {
-        return view('dashboard.adminDashboard');
+        return view('admin.home.index');
     }
     public function restaurantDashboard()
     {

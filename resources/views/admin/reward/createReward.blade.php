@@ -1,55 +1,53 @@
-<div class="modal fade" id="addMenuModal" tabindex="-1" aria-labelledby="addMenuLabel" aria-hidden="true">
+<div class="modal fade" id="addRewardModal" tabindex="-1" aria-labelledby="addRewardLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addMenuLabel">Add New Menu</h5>
+                <h5 class="modal-title" id="addRewardLabel">Add New Reward</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addMenuForm" enctype="multipart/form-data">
+                <form id="addRewardForm" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="menuName" class="form-label">Menu Name</label>
-                        <input type="text" class="form-control" id="menuName" name="menuName" required>
+                        <label for="name" class="form-label">Reward Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="category" class="form-label">Menu Category</label>
-                        <select class="form-control" id="category" name="category" required>
-                            <option value="" disabled selected style="text-align: center">Select Category</option>
-                            <option value="Appetizer">Appetizer</option>
-                            <option value="Main Course">Main Course</option>
-                            <option value="Dessert">Dessert</option>
-                            <option value="Beverages">Beverages</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="menuPrice" class="form-label">Menu Price</label>
-                        <input type="text" class="form-control" id="menuPrice" name="menuPrice" required
-                            oninput="formatPrice(this)">
-                    </div>
-                    <div class="mb-3">
-                        <label for="menuImage" class="form-label">Menu Image</label>
-                        <input class="form-control" name="menuImage" id="image" type="file"
+                        <label for="image" class="form-label">Image</label>
+                        <input class="form-control" name="image" id="image" type="file"
                             onchange="previewImage(event, 'imgPreview')" accept=".jpg,.jpeg,.png" required>
                         <img id="imgPreview" class="img-preview mt-2" src="" alt="Image Preview"
                             style="display: none; max-width: 200px; height: auto; border-radius: 10px;">
                     </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <input type="text" class="form-control" id="category" name="category">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRewardStock" class="form-label">Stock</label>
+                        <input type="text" class="form-control" id="stock" name="stock">
+                    </div>
+                    <div class="mb-3">
+                        <label for="points" class="form-label">Points</label>
+                        <input type="text" class="form-control" id="points" name="points" required
+                            oninput="formatPrice(this)">
+                    </div>
 
                     <div class="mb-3">
-                        <label for="isAvailable" class="form-label">Is Available</label>
-                        <select class="form-control" id="isAvailable" name="isAvailable" required>
-                            <option value="YES">YES</option>
-                            <option value="NO">NO</option>
+                        <label for="is_active" class="form-label">Is Active</label>
+                        <select class="form-control" id="is_active" name="is_active" required>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label">Menu Description</label>
+                        <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveMenu">Save</button>
+                <button type="submit" class="btn btn-primary" id="saveReward">Save</button>
             </div>
         </div>
     </div>
@@ -87,17 +85,20 @@
 
 
     $(document).ready(function() {
-        $('#saveMenu').on('click', function() {
+        $('#saveReward').on('click', function() {
             var formData = new FormData();
-            formData.append('menuName', $('#menuName').val());
+            //#name diambil dari id pada field form
+            formData.append('name', $('#name').val());
             formData.append('category', $('#category').val());
-            formData.append('menuPrice', $('#menuPrice').val());
-            formData.append('menuImage', $('#image')[0].files[0]);
-            formData.append('isAvailable', $('#isAvailable').val());
+            formData.append('stock', $('#stock').val());
+            // formData.append('points', $('#points').val());
+            formData.append('points', $('#points').val().replace(/,/g, ''));
+            formData.append('image', $('#image')[0].files[0]);
+            formData.append('is_active', $('#is_active').val());
             formData.append('description', $('#description').val());
 
             $.ajax({
-                url: '{{ route('menu.store') }}',
+                url: '{{ route('reward.store') }}',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -116,7 +117,7 @@
                         confirmButtonText: "OK"
                     }).then(() => {
                         $('#addMenuModal').modal('hide');
-                        $('#addMenuForm')[0].reset();
+                        $('#addRewardForm')[0].reset();
                         $('#imgPreview').hide();
                         location.reload();
                     });

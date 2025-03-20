@@ -23,7 +23,7 @@
         }
 
         .container {
-            /* max-width: 1200px; */
+            max-width: 100%;
             margin: 0 auto;
             padding: 32px;
         }
@@ -547,6 +547,30 @@
             margin-top: 20px;
         }
 
+        .pagination .page-item.active .page-link {
+            background-color: #D67B47 !important; /* Warna latar belakang aktif */
+            border-color: #D67B47 !important;
+            color: #ffffff !important; /* Warna teks aktif */
+        }
+
+        .pagination .page-link {
+            color: #5A3E2B !important; /* Warna teks default */
+            border-color: #DECEB0 !important;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #D67B47 !important; /* Warna hover */
+            color: #ffffff !important;
+        }
+
+        .text{
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-style: italic;
+            font-weight: bold;
+        }
+
         .pagination button {
             padding: 5px 10px;
             margin: 0 5px;
@@ -583,5 +607,14 @@
 
             .rewards-grid {
                 grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+
+            .pagination-right {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .pagination-right .pagination {
+                justify-content: flex-end;
             }
         }

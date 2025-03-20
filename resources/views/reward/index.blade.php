@@ -8,27 +8,32 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <link href="{{ asset('css/redem.css') }}" rel="stylesheet">
 </head>
 @extends('master.masterCustomer')
 @section('content')
 
     <body>
-        <div class="container">
+        <div class="container py-4">
             <div class="header">
                 <h1>Reward Redemption</h1>
                 <div class="user-points">
                     <i class="fas fa-coins"></i>
-                    <span>Your Points: <span id="userPoints">{{ $userPoints->point }}</span></span>
+                    <span>Your Points: <span id="userPoints">{{ $userPoints->point ?? 0 }}</span></span>
                 </div>
             </div>
 
             <div class="tabs">
-                <div class="tab active" data-tab="rewards">Available Rewards</div>
-                <div class="tab" data-tab="history">Redemption History</div>
+                <div class="tab {{ request('tab', 'rewards') === 'rewards' ? 'active' : '' }}" data-tab="rewards">Available
+                    Rewards</div>
+                <div class="tab {{ request('tab') === 'history' ? 'active' : '' }}" data-tab="history">Redemption History
+                </div>
             </div>
 
-            <div id="rewards" class="tab-content active">
+            <div id="rewards" class="tab-content {{ request('tab', 'rewards') === 'rewards' ? 'active' : '' }}">
                 <div class="filters">
                     <div class="filter-group">
                         @foreach ($categories as $cat)
@@ -38,10 +43,6 @@
                             </button>
                         @endforeach
                     </div>
-                    {{-- <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search rewards...">
-                </div> --}}
                 </div>
 
                 <div class="rewards-grid">
@@ -61,15 +62,6 @@
                                     <i class="fas fa-coins"></i>
                                     <span>{{ $reward->points }} points</span>
                                 </div>
-                                {{-- <button class="redeem-btn" data-id="{{ $reward->id }}" data-name="{{ $reward->name }}"
-                                    data-points="{{ $reward->points }}">
-                                    Redeem
-                                </button> --}}
-                                {{-- <form action="{{ route('rewards.redeem', ['id' => $reward->id]) }}" method="POST"
-                                    style="display:inline;">
-                                    @csrf
-                                    <button type="submit" class="redeem-btn">Redeem</button>
-                                </form> --}}
                                 <form id="redeemForm-{{ $reward->id }}" data-id="{{ $reward->id }}"
                                     action="{{ route('rewards.redeem', ['id' => $reward->id]) }}" method="POST">
                                     @csrf
@@ -82,58 +74,43 @@
                     @endforeach
                 </div>
             </div>
-            <div id="history" class="tab-content">
+
+            <div id="history" class="tab-content {{ request('tab') === 'history' ? 'active' : '' }}">
                 <h2>Redemption History</h2>
 
-                <div class="filter-controls">
-                    <div>
-                        <label for="status-filter">Filter by status:</label>
-                        <select id="status-filter" class="filter-dropdown">
-                            <option value="all">All</option>
-                            <option value="completed">Completed</option>
-                            <option value="pending">Pending</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="sort-order">Sort by:</label>
-                        <select id="sort-order" class="filter-dropdown">
-                            <option value="newest">Newest first</option>
-                            <option value="oldest">Oldest first</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div class="history-list">
-                    @foreach ($redeems as $item)
-                        <div class="history-item">
-                            <div class="reward-info">
-                                <div class="reward-image">
-                                    <img src="{{ asset('storage/' . $item->reward->image) }}"
-                                        alt="{{ $item->reward->name }}"
-                                        style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;">
-                                </div>
-                                <div class="reward-details">
-                                    <h3 class="text-lg font-semibold mb-2">{{ $item->reward->name ?? 'Reward Not Found' }}
-                                    </h3>
-                                    <p class="mb-2">Points Used: <strong>{{ $item->points_used }}</strong> Point(s)</p>
-                                    <p class="mb-2">Redemption Code: <span
-                                            class="fst-italic">{{ $item->redemption_code }}</span></p>
-                                </div>
-                            </div>
-                            <div class="reward-meta">
-                                <div class="reward-date">{{ $item->created_at->format('d M Y H:i') }}</div>
-                                <div class="reward-status status-completed">{{ $item->status }}</div>
-                            </div>
+                    @if ($redeems->isEmpty())
+                        <div class="text">
+                            <p>You haven’t redeemed any rewards yet.</p>
                         </div>
-                    @endforeach
+                    @else
+                        @foreach ($redeems as $item)
+                            <div class="history-item">
+                                <div class="reward-info">
+                                    <div class="reward-image">
+                                        <img src="{{ asset('storage/' . $item->reward->image) }}"
+                                            alt="{{ $item->reward->name }}"
+                                            style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px;">
+                                    </div>
+                                    <div class="reward-details">
+                                        <h3 class="text-lg font-semibold mb-2">
+                                            {{ $item->reward->name ?? 'Reward Not Found' }}</h3>
+                                        <p class="mb-2">Points Used: <strong>{{ $item->points_used }}</strong> Point(s)
+                                        </p>
+                                        <p class="mb-2">Redemption Code: <span
+                                                class="fst-italic">{{ $item->redemption_code }}</span></p>
+                                    </div>
+                                </div>
+                                <div class="reward-meta">
+                                    <div class="reward-date">{{ $item->created_at->format('d M Y H:i') }}</div>
+                                    <div class="reward-status status-completed">{{ $item->status }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
-
-                <div class="pagination">
-                    <button>1</button>
-                    <button class="active">2</button>
-                    <button>3</button>
-                    <button>Next →</button>
+                <div class="pagination-container pagination-right mt-4">
+                    {{ $redeems->appends(['tab' => 'history'])->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>
@@ -148,6 +125,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                // Update URL dengan query parameter tab
+                const url = new URL(window.location);
+                url.searchParams.set('tab', tabName);
+                window.history.pushState({}, '', url);
+
+                // Aktivasi tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
         document.querySelectorAll('.filter-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const selectedCategory = this.getAttribute('data-category');

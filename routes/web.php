@@ -81,7 +81,7 @@ Route::middleware(['customer'])->group(function () {
     Route::post('/rating/store', [RatingRestaurantController::class, 'store'])->name('rating.store');
 
     //REWARD
-    Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
+    Route::get('/rewards', [RewardController::class, 'show'])->name('rewards.show');
     Route::post('/rewards/{id}/redeem', [RedemptionController::class, 'redeem'])->name('rewards.redeem');
     Route::get('/redemptions/{redemption}/success', [RedemptionController::class, 'success'])->name('rewards.redemption.success');
     Route::get('/redemptions/history', [RedemptionController::class, 'history'])->name('rewards.redemption.history');
@@ -92,7 +92,18 @@ Route::middleware(['customer'])->group(function () {
 Route::middleware(['admin'])->group(function () {
 
     Route::get('/dashboardAdmin', [AuthController::class, 'adminDashboard'])->name('adminDashboard');
+
+    //Manage Reward
+    Route::get('/reward', [RewardController::class, 'index'])->name('reward.index');
+    Route::delete('/reward/{id}', [RewardController::class, 'destroy'])->name('reward.destroy');
+    Route::get('/reward/{id}/edit', [RewardController::class, 'edit'])->name('reward.edit');
+    Route::post('/reward/{id}/update', [RewardController::class, 'update'])->name('reward.update');
+    Route::post('/addReward', [RewardController::class, 'store'])->name('reward.store');
+
+
     Route::get('/logoutAdmin', [AuthController::class, 'logout'])->name('logoutAdmin');
+    Route::post('logout', [AuthController::class, 'logout']);
+
 });
 
 Route::middleware(['restaurant'])->group(function () {
@@ -113,9 +124,9 @@ Route::middleware(['restaurant'])->group(function () {
     //TABLE
     Route::get('/table', [TableRestaurantController::class, 'index'])->name('table.index');
     Route::delete('/table/{id}', [TableRestaurantController::class, 'destroy'])->name('table.destroy');
-    // Route::get('/menu/{id}/edit', [MenuRestaurantController::class, 'edit'])->name('menu.edit');
-    // Route::post('/menu/{id}/update', [MenuRestaurantController::class, 'update'])->name('menu.update');
-    // Route::post('/addMenu', [MenuRestaurantController::class, 'store'])->name('menu.store');
+    Route::get('/table/{id}/edit', [TableRestaurantController::class, 'edit'])->name('table.edit');
+    Route::post('/table/{id}/update', [TableRestaurantController::class, 'update'])->name('table.update');
+    Route::post('/addTable', [TableRestaurantController::class, 'store'])->name('table.store');
 
     Route::get('/order', function () {
         return view('restaurant.order.index');

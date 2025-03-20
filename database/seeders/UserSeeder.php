@@ -117,6 +117,17 @@ class UserSeeder extends Seeder
                 'remember_token' => Str::random(10),
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+            [
+                'id' => 11,
+                'email' => 'sendnotificationbykulinerin@gmail.com',
+                'username' => 'Admin',
+                'role' => '3',
+                'email_verified_at' => now(),
+                'password' => bcrypt('qwerty123'),
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         ]);
     }

@@ -15,6 +15,12 @@
         min-height: 100vh;
     }
 
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 32px;
+    }
+
     .card img {
         max-height: 150px;
         /* object-fit: cover; */
@@ -73,44 +79,22 @@
 @section('content')
 
     <body>
-        <div class="container mt-4">
-            <ul class="nav nav-pills">
-                {{-- <li class="nav-item">
-                <a class="nav-link" href="#appetizer">Appetizer</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="#main-courses">Main Courses</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#desert">Desert</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#beverages">Beverages</a>
-            </li> --}}
-
-                {{-- <p class="reservation-text" id="hidden-restaurant-city"></p> --}}
-                <input type="hidden" id="hidden-guest-info" name="guest_info">
-                <input type="hidden" id="hidden-restaurant-name" name="restaurant_name">
-                <input type="hidden" id="hidden-restaurant-city" name="restaurant_city">
-                <input type="hidden" id="hidden-reservation-info" name="reservation_info">
-
-                <li class="nav-item ms-auto">
-                    <form method="POST" action="{{ route('detailOrder') }}" id="detailOrderForm">
-                        @csrf
-                    </form>
-                    <button class="btn btn-primary" onclick="detailOrder()">Go to cart</button>
-                </li>
-            </ul>
-        </div>
-
         <!-- Main Content -->
-        <div class="container my-4">
+        <div class="container py-4">
+            <div class="text-end">
+                <form method="POST" action="{{ route('detailOrder') }}" id="detailOrderForm">
+                    @csrf
+                </form>
+                <button class="btn" style="background-color: #D67B47ff" onclick="detailOrder()">Go to cart</button>
+            </div>
+
             @foreach ($menuItems as $category => $menus)
                 <h2 class="mb-4 fs-2" style="padding-bottom:10px">{{ $category }}</h2>
                 <div class="row g-4" style="padding-bottom: 2rem">
                     @foreach ($menus as $menu)
                         <div class="col-12 col-sm-6 col-md-4" style="padding-top: 1rem;">
-                            <div class="card h-100 d-flex flex-column">
+                            <div class="card h-100 d-flex flex-column"
+                                style="border-radius: 20px; background-color: #DECEB0ff; border-color: white; overflow: hidden;">
                                 <div class="row g-0 h-100">
                                     <div class="col-5 h-100 d-flex">
                                         <img src="{{ asset('storage/' . $menu->menuImage) }}"
@@ -123,7 +107,7 @@
                                             <h5 class="card-title" id="menuName">{{ $menu->menuName }}</h5>
                                             <p class="card-text small">{{ $menu->description }}</p>
                                         </div>
-                                        <div class="card-footer bg-white border-0 px-3 py-2">
+                                        <div class="card-footer border-0 px-3 py-2" style="background-color: #DECEB0ff;">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <span id="menuPrice" class="fw-bold">
                                                     {{ number_format($menu->menuPrice, 0, '.', ',') }}

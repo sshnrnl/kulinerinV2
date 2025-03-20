@@ -8,184 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #DECEB0ff;
-        }
-
-        .filter-card {
-            background-color: #F0D4A3;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .transaction-card {
-            border-radius: 8px;
-            margin-bottom: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .apply-button {
-            background-color: #D67B47ff;
-            color: white;
-            border: none;
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 150px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-
-        .rating-stars {
-            color: #000;
-        }
-
-        .rating-stars .filled {
-            color: #000;
-        }
-
-        .rating-stars .empty {
-            color: #dee2e6;
-        }
-
-        .location-icon {
-            margin-right: 5px;
-            color: #6c757d;
-        }
-
-        .address-text {
-            font-size: 0.9rem;
-        }
-
-        .status-label {
-            font-weight: bold;
-        }
-
-        /* Custom css for image placement */
-        .transaction-image {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        .transaction-details {
-            flex: 1;
-            position: relative;
-            padding-bottom: 40px;
-            /* Space for the rating */
-        }
-
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 32px;
-        }
-
-        /* Rating positioning */
-        .rating-container {
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-        }
-
-        .rating-container:hover {
-            transform: scale(1.1);
-            /* Perbesar saat hover */
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* Overlay filter button */
-        .filter-toggle {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: auto;
-            z-index: 1000;
-            border-radius: 50px;
-            padding: 10px 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            background-color: #D67B47ff;
-            color: white;
-            border: none;
-            font-weight: 500;
-        }
-
-        /* Positioning for filter section when shown as overlay */
-        .filter-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .filter-content {
-            width: 90%;
-            max-width: 350px;
-            max-height: 90vh;
-            overflow-y: auto;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            position: relative;
-        }
-
-        .close-filter {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            line-height: 1;
-        }
-
-        .stars {
-            color: #f97e0a;
-            font-size: 24px;
-        }
-
-        @media (max-width: 767.98px) {
-            .transaction-card {
-                display: flex;
-                flex-direction: row;
-            }
-
-            .transaction-image {
-                width: 160px;
-                min-width: 160px;
-            }
-
-            .filter-section {
-                display: none;
-            }
-
-            .filter-toggle {
-                display: block;
-            }
-
-            .filter-overlay.active {
-                display: flex;
-            }
-        }
-    </style>
+    <link href="{{ asset('css/history.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -196,16 +19,19 @@
             <div class="row">
                 <div class="col-md-3 mb-3 filter-section ms-n2" id="filterSection">
                     <div class="filter-card">
-                        <form>
+                        <form method="GET" action="{{ route('history') }}" id="desktopFilterForm">
                             <div class="mb-3">
-                                <label for="fromDate" class="form-label">From Date</label>
-                                <input type="date" class="form-control" id="fromDate">
+                                <label for="fromDateDesktop" class="form-label">From Date</label>
+                                <input type="date" class="form-control" id="fromDateDesktop" name="fromDate"
+                                    value="{{ $fromDate ?? '' }}">
                             </div>
                             <div class="mb-3">
-                                <label for="toDate" class="form-label">To Date</label>
-                                <input type="date" class="form-control" id="toDate">
+                                <label for="toDateDesktop" class="form-label">To Date</label>
+                                <input type="date" class="form-control" id="toDateDesktop" name="toDate"
+                                    value="{{ $toDate ?? '' }}">
                             </div>
-                            <button type="submit" class="btn apply-button w-100">Apply</button>
+                            <div class="alert alert-danger mt-2" id="dateErrorDesktop" style="display: none;"></div>
+                            <button type="submit" class="apply-button w-100" id="applyButtonDesktop">Apply</button>
                         </form>
                     </div>
                 </div>
@@ -263,36 +89,6 @@
                                         |
                                         Time: {{ \Carbon\Carbon::parse($reservation->reservationTime)->format('H:i') }} WIB
                                     </p>
-                                    {{-- <p class="card-text mb-1">
-                                    <strong>Guests:</strong> {{ $reservation->guest }}
-                                </p>
-                                <p class="card-text mb-1">
-                                    <strong>Menu Ordered:</strong>
-                                    @if (!empty($reservation->menuData) && is_string($reservation->menuData))
-                                        @php
-                                            $menuItems = json_decode($reservation->menuData, true);
-                                        @endphp
-
-                                        @if (is_array($menuItems))
-                                            <p class="card-text mb-1"><strong>Menu Ordered:</strong></p>
-                                            <ul>
-                                                @foreach ($menuItems as $menu)
-                                                    <li>{{ $menu['qty'] }}x {{ $menu['menuName'] }} - Rp
-                                                        {{ number_format($menu['menuPrice'], 0, ',', '.') }}</li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            <p>No menu ordered</p>
-                                        @endif
-                                    @else
-                                        <p>No menu ordered</p>
-                                    @endif
-
-                                </p>
-                                <p class="card-text">
-                                    <strong>Total Price:</strong> Rp
-                                    {{ number_format($reservation->priceTotal, 0, ',', '.') }}
-                                </p> --}}
                                     <div class="status">
                                         <p class="card-text">
                                             <span
@@ -343,76 +139,13 @@
                                                     </button>
                                                 @endif
                                             @endif
-
-
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
                         @endforeach
-                        <!-- See More Link -->
                         <p class="text-center mt-4 text-muted">Display all transaction records...</p>
                     @endif
-
-                    <!-- Transaction Card 1 -->
-                    {{-- <div class="transaction-card bg-white d-flex">
-                    <div class="transaction-image">
-                        <div class="image-placeholder h-100">IMAGE</div>
-                    </div>
-                    <div class="transaction-details p-3">
-                        <h4 class="card-title mb-2">Wing Heng</h4>
-                        <p class="card-text mb-1">
-                            <i class="fas fa-map-marker-alt location-icon"></i>
-                            <span class="address-text">Jl. Danau Sunter Utara Blok D1 No. 12 - 13</span>
-                        </p>
-                        <p class="card-text mb-1">Date</p>
-                        <div class="status">
-                            <p class="card-text">
-                                <span class="status-label">Status</span>
-                            </p>
-                        </div>
-                        <div class="rating-container">
-                            <button class="btn btn-sm btn-outline-dark">
-                                Give Rating <i class="fas fa-edit ms-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div> --}}
-
-                    {{-- DIV TRANSACTION --}}
-                    {{-- <div class="transaction-card bg-white d-flex">
-                    <div class="transaction-image">
-                        <div class="image-placeholder h-100">IMAGE</div>
-                    </div>
-                    <div class="transaction-details p-3">
-                        <h4 class="card-title mb-2">Wing Heng</h4>
-                        <p class="card-text mb-1">
-                            <i class="fas fa-map-marker-alt location-icon"></i>
-                            <span class="address-text">Jl. Danau Sunter Utara Blok D1 No. 12 - 13</span>
-                        </p>
-                        <p class="card-text mb-1">Date</p>
-                        <div class="status">
-                            <p class="card-text">
-                                <span class="status-label">Status</span>
-                            </p>
-                        </div>
-                        <div class="rating-container">
-                            <div class="rating-stars">
-                                <i class="fas fa-star filled"></i>
-                                <i class="fas fa-star filled"></i>
-                                <i class="fas fa-star filled"></i>
-                                <i class="fas fa-star filled"></i>
-                                <i class="fas fa-star empty"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
-
-                    {{-- <!-- See More Link -->
-                    <p class="text-center mt-4 text-muted">Display all transaction records...</p> --}}
                 </div>
             </div>
         </div>
@@ -427,16 +160,19 @@
             <div class="filter-content">
                 <button class="close-filter" id="closeFilter">×</button>
                 <h5 class="mb-3">Filter Transactions</h5>
-                <form>
+                <form method="GET" action="{{ route('history') }}" id="mobileFilterForm">
                     <div class="mb-3">
-                        <label for="overlayFromDate" class="form-label">From Date</label>
-                        <input type="date" class="form-control" id="overlayFromDate">
+                        <label for="fromDateMobile" class="form-label">From Date</label>
+                        <input type="date" class="form-control" id="fromDateMobile" name="fromDate"
+                            value="{{ $fromDate ?? '' }}">
                     </div>
                     <div class="mb-3">
-                        <label for="overlayToDate" class="form-label">To Date</label>
-                        <input type="date" class="form-control" id="overlayToDate">
+                        <label for="toDateMobile" class="form-label">To Date</label>
+                        <input type="date" class="form-control" id="toDateMobile" name="toDate"
+                            value="{{ $toDate ?? '' }}">
                     </div>
-                    <button type="submit" class="btn apply-button w-100">Apply</button>
+                    <div class="alert alert-danger mt-2" id="dateErrorMobile" style="display: none;"></div>
+                    <button type="submit" class="btn apply-button w-100" id="applyButtonMobile">Apply</button>
                 </form>
             </div>
         </div>
@@ -487,6 +223,157 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle mobile overlay
+                const showFilterOverlay = document.getElementById('showFilterOverlay');
+                const closeFilterOverlay = document.getElementById('closeFilterOverlay');
+                const filterOverlay = document.getElementById('filterOverlay');
+
+                if (showFilterOverlay) {
+                    showFilterOverlay.addEventListener('click', function() {
+                        filterOverlay.style.display = 'block';
+                        document.body.style.overflow = 'hidden'; // Prevent scrolling behind overlay
+                    });
+                }
+
+                if (closeFilterOverlay) {
+                    closeFilterOverlay.addEventListener('click', function() {
+                        filterOverlay.style.display = 'none';
+                        document.body.style.overflow = ''; // Re-enable scrolling
+                    });
+                }
+
+                // Apply validation to both forms
+                setupFormValidation('desktopFilterForm', 'fromDateDesktop', 'toDateDesktop', 'dateErrorDesktop',
+                    'applyButtonDesktop');
+                setupFormValidation('mobileFilterForm', 'fromDateMobile', 'toDateMobile', 'dateErrorMobile',
+                    'applyButtonMobile');
+
+                // Sync values between forms (optional)
+                syncFormValues('fromDateDesktop', 'fromDateMobile');
+                syncFormValues('toDateDesktop', 'toDateMobile');
+
+                function setupFormValidation(formId, fromDateId, toDateId, dateErrorId, applyButtonId) {
+                    const form = document.getElementById(formId);
+                    const fromDateInput = document.getElementById(fromDateId);
+                    const toDateInput = document.getElementById(toDateId);
+                    const dateError = document.getElementById(dateErrorId);
+                    const applyButton = document.getElementById(applyButtonId);
+
+                    if (!form || !fromDateInput || !toDateInput || !dateError || !applyButton) {
+                        return; // Skip if any element doesn't exist
+                    }
+
+                    // Form submission handler
+                    form.addEventListener('submit', function(event) {
+                        // Clear previous error messages
+                        dateError.style.display = 'none';
+                        fromDateInput.classList.remove('is-invalid');
+                        toDateInput.classList.remove('is-invalid');
+
+                        // Check for empty fields
+                        const emptyFields = [];
+                        if (!fromDateInput.value) {
+                            fromDateInput.classList.add('is-invalid');
+                            emptyFields.push('From Date');
+                        }
+
+                        if (!toDateInput.value) {
+                            toDateInput.classList.add('is-invalid');
+                            emptyFields.push('To Date');
+                        }
+
+                        // Show error for empty fields and prevent submission
+                        if (emptyFields.length > 0) {
+                            event.preventDefault();
+                            dateError.textContent = `Field ${emptyFields.join(' and ')} must be Filled`;
+                            dateError.style.display = 'block';
+                            return;
+                        }
+
+                        // Both dates are filled, perform additional validations
+                        const fromDate = new Date(fromDateInput.value);
+                        const toDate = new Date(toDateInput.value);
+
+                        // Check if fromDate > toDate
+                        if (fromDate > toDate) {
+                            event.preventDefault();
+                            dateError.textContent = 'From Date must be less than or equal to To Date';
+                            dateError.style.display = 'block';
+                            return;
+                        }
+
+                        // Check if date range exceeds 7 days
+                        const timeDiff = toDate - fromDate;
+                        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+                        if (daysDiff > 7) {
+                            event.preventDefault();
+                            dateError.textContent = 'Date range cannot exceed 7 days';
+                            dateError.style.display = 'block';
+                            return;
+                        }
+                    });
+
+                    // Real-time validation
+                    function validateInputs() {
+                        // Reset errors
+                        dateError.style.display = 'none';
+                        applyButton.disabled = false;
+
+                        // Skip if either field is empty
+                        if (!fromDateInput.value || !toDateInput.value) {
+                            return;
+                        }
+
+                        const fromDate = new Date(fromDateInput.value);
+                        const toDate = new Date(toDateInput.value);
+
+                        // Check date order
+                        if (fromDate > toDate) {
+                            dateError.textContent = 'From Date must be less than or equal to To Date';
+                            dateError.style.display = 'block';
+                            applyButton.disabled = true;
+                            return;
+                        }
+
+                        // Check date range
+                        const timeDiff = toDate - fromDate;
+                        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+                        if (daysDiff > 7) {
+                            dateError.textContent = 'Date range cannot exceed 7 days';
+                            dateError.style.display = 'block';
+                            applyButton.disabled = true;
+                            return;
+                        }
+                    }
+
+                    // Add event listeners for real-time validation
+                    fromDateInput.addEventListener('change', validateInputs);
+                    toDateInput.addEventListener('change', validateInputs);
+                }
+
+                // Function to sync values between desktop and mobile forms (optional)
+                function syncFormValues(sourceId, targetId) {
+                    const sourceInput = document.getElementById(sourceId);
+                    const targetInput = document.getElementById(targetId);
+
+                    if (!sourceInput || !targetInput) {
+                        return;
+                    }
+
+                    sourceInput.addEventListener('change', function() {
+                        targetInput.value = sourceInput.value;
+                    });
+
+                    targetInput.addEventListener('change', function() {
+                        sourceInput.value = targetInput.value;
+                    });
+                }
+            });
+
+
             // Toggle filter overlay
             document.getElementById('filterToggle').addEventListener('click', function() {
                 document.getElementById('filterOverlay').classList.add('active');
@@ -540,7 +427,7 @@
                                 },
                                 error: function(xhr) {
                                     Swal.fire({
-                                        title: "Error!",
+                                        title: "Oopss!",
                                         text: xhr.responseJSON.message ||
                                             "Something went wrong!",
                                         icon: "error",

@@ -160,10 +160,9 @@ class ReservationController extends Controller
         return view('order.orderDetail', compact('orderData', 'orderDataJson', 'grandTotal', 'guestInfo', 'areaInfo', 'reservationDate', 'restaurantId', 'reservationTime', 'restaurantName', 'restaurantCity'));
     }
 
-    public function history()
+    public function history(Request $request)
     {
         // Ambil user yang sedang login
-        // $user = Auth::user();
         $user = User::where('id', Auth::id())->first();
 
         // Cek apakah user sudah login
@@ -171,15 +170,28 @@ class ReservationController extends Controller
             return redirect('/login')->with('error', 'You need to login first.');
         }
 
-        // Ambil semua riwayat booking berdasarkan user_id, termasuk relasi restaurant
-        $reservations = Reservation::with('restaurant')
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Initialize query
+        $query = Reservation::with('restaurant')
+            ->where('user_id', $user->id);
 
+        // Check if date filters are provided
+        if ($request->has('fromDate') && $request->fromDate) {
+            $query->whereDate('reservationDate', '>=', $request->fromDate);
+        }
+
+        if ($request->has('toDate') && $request->toDate) {
+            $query->whereDate('reservationDate', '<=', $request->toDate);
+        }
+
+        // Get results sorted by created_at
+        $reservations = $query->orderBy('created_at', 'desc')->get();
+
+        // Pass filter values to view for maintaining form state
+        $fromDate = $request->fromDate ?? '';
+        $toDate = $request->toDate ?? '';
 
         // Tampilkan di view history
-        return view('history.orderHistory', compact('reservations'));
+        return view('history.orderHistory', compact('reservations', 'fromDate', 'toDate'));
     }
 
     public function cancelOrder($id)

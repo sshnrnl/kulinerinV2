@@ -1,19 +1,19 @@
-@extends('dashboard.restaurantDashboard')
+@extends('dashboard.adminDashboard')
 
-@section('title', 'Table Management')
+@section('title', 'Reward Management')
 
 @section('content')
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2>Manage Table</h2>
+                <h2>Manage Reward</h2>
                 <div class="card border-0 shadow-sm mt-4">
                     <div class="card-body border">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title mb-0">Table List</h5>
+                            <h5 class="card-title mb-0">Reward List</h5>
                             <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#addTableModal">
-                                <i class="bi bi-plus"></i> Add Table
+                                data-bs-target="#addRewardModal">
+                                <i class="bi bi-plus"></i> Add Reward
                             </a>
                         </div>
                         <hr>
@@ -25,36 +25,59 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Table Capacity</th>
-                                        <th>Available Tables</th>
-                                        <th>Action</th>
+                                        <th>Reward Name</th>
+                                        <th>Image</th>
+                                        <th>Category</th>
+                                        <th>Stock</th>
+                                        <th>Points</th>
+                                        <th>Is Active</th>
+                                        <th>Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tableRestaurant as $table)
+                                    @foreach ($rewards as $reward)
                                         <tr>
-                                            <td>{{ $table->tableCapacity }} People(s)</td>
-                                            <td>{{ $table->availableTables }} Table(s)</td>
+                                            <td>{{ $reward->name }}</td>
+                                            <td>
+                                                @if ($reward->image)
+                                                    <img src="{{ asset('storage/' . $reward->image) }}" width="50"
+                                                        height="50" alt="Reward Image">
+                                                @else
+                                                    No Image
+                                                @endif
+                                            </td>
+                                            <td>{{ $reward->category }}</td>
+                                            <td>{{ $reward->stock }}</td>
+                                            <td>{{ $reward->points }}</td>
+                                            <td>
+                                                <span class="badge {{ $reward->is_active ? 'bg-success' : 'bg-danger' }}">
+                                                    {{ $reward->is_active ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $reward->description ?? 'No description' }}</td>
                                             <td>
                                                 <div class="d-flex gap-1">
+                                                    <!-- Tombol Edit -->
                                                     <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                        data-bs-target="#editTableModal" data-id="{{ $table->id }}">
-                                                        <i class="bi bi-pencil-square">Edit</i>
+                                                        data-bs-target="#editRewardModal" data-id="{{ $reward->id }}">
+                                                        <i class="bi bi-pencil-square"></i> Edit
                                                     </a>
+
+                                                    <!-- Form Hapus -->
                                                     <form class="delete-form d-inline"
-                                                        action="{{ route('table.destroy', $table->id) }}" method="POST">
+                                                        action="{{ route('reward.destroy', $reward->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="button" class="btn btn-sm btn-danger delete-btn">
-                                                            <i class="bi bi-trash">Delete</i>
+                                                        <button type="submit" class="btn btn-sm btn-danger delete-btn">
+                                                            <i class="bi bi-trash"></i> Delete
                                                         </button>
                                                     </form>
-
                                                 </div>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -111,6 +134,6 @@
 
         //
     </script>
-    @include('restaurant.table.createTable')
-    @include('restaurant.table.updateTable')
+    @include('admin.reward.createReward')
+    @include('admin.reward.updateReward')
 @endsection
